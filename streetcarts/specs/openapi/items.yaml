@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  version: '0.1'
+  version: '1.0'
   title: Items API
   description: Manage menu items for a food cart.
-host: artomatic-test.apigee.net
 basePath: /v1/streetcarts
+host: org_name-env.apigee.net
 schemes:
   - http
   - https
@@ -15,8 +15,8 @@ produces:
 paths:
   '/items/{item_id}':
     get:
-      description: Lists menu item details.
-      operationId: getItemById
+      description: View details for a menu item.
+      operationId: Get Menu Item By ID
       parameters:
         - name: item_id
           in: path
@@ -28,13 +28,9 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/item'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
     put:
-      description: Updates a menu item.
-      operationId: updateItemById
+      description: Update a menu item.
+      operationId: Update Menu Item
       parameters:
         - name: item_id
           in: path
@@ -46,19 +42,15 @@ paths:
           required: true
           description: Updates for the menu item.
           schema:
-            $ref: '#/definitions/updateItem'
+            $ref: '#/definitions/itemDetails'
       responses:
         '200':
           description: Success
           schema:
             $ref: '#/definitions/item'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
     delete:
-      description: Deletes a menu item.
-      operationId: deleteItemById
+      description: Delete a menu item.
+      operationId: Delete Menu Item
       parameters:
         - name: item_id
           in: path
@@ -70,13 +62,10 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/item'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
 definitions:
   item:
     type: object
+    description: Menu item details.
     properties:
       uuid:
         type: string
@@ -93,7 +82,7 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
-  updateItem:
+  itemDetails:
     type: object
     properties:
       description:
@@ -103,9 +92,5 @@ definitions:
         type: string
         description: Name of the menu item.
       price:
-        type: number
-        description: Price of the menu item.
-  UnauthorizedResponse:
-    properties:
-      message:
         type: string
+        description: Price of the menu item.

@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  version: '0.1'
+  version: '1.0'
   title: Menus API
   description: Manage menus in your food cart.
-host: artomatic-test.apigee.net
 basePath: /v1/streetcarts
+host: org_name-env.apigee.net
 schemes:
   - http
   - https
@@ -15,8 +15,8 @@ produces:
 paths:
   '/menus/{menu_id}':
     get:
-      description: Lists menu details.
-      operationId: getMenuById
+      description: View details for a menu.
+      operationId: Get Menu by ID
       parameters:
         - name: menu_id
           in: path
@@ -27,14 +27,10 @@ paths:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/menu'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
+            $ref: '#/definitions/menuDetails'
     delete:
-      description: Deletes a menu.
-      operationId: deleteMenuById
+      description: Delete a menu.
+      operationId: Delete Menu
       parameters:
         - name: menu_id
           in: path
@@ -46,14 +42,10 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/menu'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
   '/menus/{menu_id}/items':
     get:
-      description: Lists all items on a menu.
-      operationId: getItemsForMenu
+      description: View all items on a menu.
+      operationId: Get Items on Menu
       parameters:
         - name: menu_id
           in: path
@@ -65,14 +57,10 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/items'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
   '/menus/{menu_id}/items/{item_id}':
     put:
-      description: Adds an item to a menu.
-      operationId: addItemToMenu
+      description: Add an item to a menu.
+      operationId: Add Item to Menu
       parameters:
         - name: menu_id
           in: path
@@ -88,13 +76,9 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/item'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
     delete:
-      description: Deletes an item from a menu.
-      operationId: deleteItemFromMenu
+      description: Remove an item from a menu.
+      operationId: Remove Item from Menu
       parameters:
         - name: menu_id
           in: path
@@ -111,13 +95,10 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/item'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
 definitions:
-  menu:
+  menuDetails:
     type: object
+    description: Menu details.
     properties:
       uuid:
         description: ID of the menu.
@@ -132,18 +113,61 @@ definitions:
         type: array
         description: List of menu items.
         items:
-          $ref: '#/definitions/item'
+          properties:
+            uuid:
+              type: string
+              description: ID of the menu item.
+            cartID:
+              type: string
+              description: ID of the food cart.
+            description:
+              type: string
+              description: Description of the menu item.
+            itemName:
+              type: string
+              description: Name of the menu item.
+            price:
+              type: number
+              description: Price of the menu item.
+  menu:
+    type: object
+    properties:
+      uuid:
+        description: ID of the menu.
+        type: string
+      cartID:
+        description: ID of the food cart.
+        type: string
+      menuName:
+        type: string
+        description: Name of the menu.
   items:
     type: array
     description: List of menu items.
     items:
-      $ref: '#/definitions/item'
+      properties:
+        uuid:
+          type: string
+          description: ID of the menu item.
+        cartID:
+          type: string
+          description: ID of the food cart.
+        description:
+          type: string
+          description: Description of the menu item.
+        itemName:
+          type: string
+          description: Name of the menu item.
+        price:
+          type: number
+          description: Price of the menu item.
   item:
     type: object
+    description: Menu item details.
     properties:
       uuid:
         type: string
-        description: ID of the item.
+        description: ID of the menu item.
       cartID:
         type: string
         description: ID of the food cart.
@@ -155,10 +179,4 @@ definitions:
         description: Name of the menu item.
       price:
         type: number
-        description: Price of the menu itme.
-  UnauthorizedResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
+        description: Price of the menu item.

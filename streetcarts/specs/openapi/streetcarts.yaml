@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
   version: '1.0'
-  description: Manage food carts.
-  title: Food Carts API
+  title: StreetCarts API
+  description: StreetCarts API.
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
@@ -13,7 +13,7 @@ consumes:
 produces:
   - application/json
 paths:
-  '/foodcarts':
+  /foodcarts:
     get:
       description: View all food carts.
       operationId: Get Food Carts
@@ -156,7 +156,211 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/item'
+  '/menus/{menu_id}':
+    get:
+      description: View details for a menu.
+      operationId: Get Menu by ID
+      parameters:
+        - name: menu_id
+          in: path
+          description: ID of the menu.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/menuDetails'
+    delete:
+      description: Delete a menu.
+      operationId: Delete Menu
+      parameters:
+        - name: menu_id
+          in: path
+          description: ID of the menu.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/menu'
+  '/menus/{menu_id}/items':
+    get:
+      description: View all items on a menu.
+      operationId: Get Items on Menu
+      parameters:
+        - name: menu_id
+          in: path
+          description: ID of the menu.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/items'
+  '/menus/{menu_id}/items/{item_id}':
+    put:
+      description: Add an item to a menu.
+      operationId: Add Item to Menu
+      parameters:
+        - name: menu_id
+          in: path
+          description: ID of the menu.
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/item'
+    delete:
+      description: Remove an item from a menu.
+      operationId: Remove Item from Menu
+      parameters:
+        - name: menu_id
+          in: path
+          description: ID of the menu.
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          description: ID of the menu item.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/item'
+  '/items/{item_id}':
+    get:
+      description: View details for a menu item.
+      operationId: Get Menu Item By ID
+      parameters:
+        - name: item_id
+          in: path
+          description: ID of the menu item.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/item'
+    put:
+      description: Update a menu item.
+      operationId: Update Menu Item
+      parameters:
+        - name: item_id
+          in: path
+          description: ID of the menu item.
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          description: Updates for the menu item.
+          schema:
+            $ref: '#/definitions/itemDetails'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/item'
+    delete:
+      description: Delete a menu item.
+      operationId: Delete Menu Item
+      parameters:
+        - name: item_id
+          in: path
+          description: ID of the menu item.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/item'
+  /users:
+    get:
+      description: View all users.
+      operationId: Get Users
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/users'
+    post:
+      description: Create a user.
+      operationId: Create User
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updates for the menu item.
+          schema:
+            $ref: '#/definitions/userDetails'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/user'
+  '/users/{user_id}':
+    get:
+      description: View details for a user.
+      operationId: Get User By ID
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/user'
 definitions:
+  menus:
+    type: array
+    description: List of menus.
+    items:
+      properties:
+        uuid:
+          type: string
+          description: ID of the menu.
+        cartID:
+          type: string
+          description: ID of the food cart.
+        menuName:
+          type: string
+          description: Name of the menu.
+  menuName:
+    type: object
+    required:
+      - menuName
+    properties:
+      menuName:
+        type: string
+        description: Name of the menu.
+  itemDetails:
+    type: object
+    properties:
+      description:
+        type: string
+        description: Description of the menu item.
+      itemName:
+        type: string
+        description: Name of the menu item.
+      price:
+        type: string
+        description: Price of the menu item.
   foodcarts:
     type: array
     description: List of food carts.
@@ -268,28 +472,39 @@ definitions:
       url:
         type: string
         description: URL of the food cart.
-  menus:
-    type: array
-    description: List of menus.
-    items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        menuName:
-          type: string
-          description: Name of the menu.
-  menuName:
+  menuDetails:
     type: object
-    required:
-      - menuName
+    description: Menu details.
     properties:
+      uuid:
+        description: ID of the menu.
+        type: string
+      cartID:
+        description: ID of the food cart.
+        type: string
       menuName:
         type: string
         description: Name of the menu.
+      items:
+        type: array
+        description: List of menu items.
+        items:
+          properties:
+            uuid:
+              type: string
+              description: ID of the menu item.
+            cartID:
+              type: string
+              description: ID of the food cart.
+            description:
+              type: string
+              description: Description of the menu item.
+            itemName:
+              type: string
+              description: Name of the menu item.
+            price:
+              type: number
+              description: Price of the menu item.
   menu:
     type: object
     properties:
@@ -341,15 +556,78 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
-  itemDetails:
+  userDetails:
     type: object
+    required:
+      - username
+      - password
     properties:
-      description:
+      firstName:
         type: string
-        description: Description of the menu item.
-      itemName:
+        description: First name of user.
+      lastName:
         type: string
-        description: Name of the menu item.
-      price:
+        description: Last name of user.
+      address:
         type: string
-        description: Price of the menu item.
+        description: Street address of user.
+      city:
+        type: string
+        description: City where user resides.
+      region:
+        type: string
+        description: Region or state where user resides.
+      postalCode:
+        type: string
+        description: Postal code where user resides.
+      email:
+        type: string
+        description: Email for contacting user.
+      username:
+        type: string
+        description: User name.
+      password:
+        type: string
+        description: Password.
+  users:
+    type: array
+    description: List of users.
+    items:
+      $ref: '#/definitions/userDetails'
+  user:
+    type: object
+    description: User details
+    properties:
+      uuid:
+        type: string
+        description: ID of the user.
+      username:
+        type: string
+        description: Username.
+      email:
+        type: string
+        description: Email for contacting user.
+      activated:
+        type: boolean
+        description: Flag that specifies whether the user is activated.
+      picture:
+        type: string
+        description: URL to user picture.
+      address:
+        type: string
+        description: Street address of user.
+      city:
+        type: string
+        description: City where user resides.
+      firstName:
+        type: string
+        description: First name of user.
+      lastName:
+        type: string
+        description: Last name of user.
+      postalCode:
+        type: string
+        description: Postal code where user resides.
+      region:
+        type: string
+        description: Region or state where user resides.

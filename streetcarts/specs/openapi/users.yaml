@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-  version: '0.1'
+  version: '1.0'
   title: Users API
-host: artomatic-test.apigee.net
 basePath: /v1/streetcarts
+host: org_name-env.apigee.net
 schemes:
   - http
   - https
@@ -14,33 +14,32 @@ produces:
 paths:
   '/users':
     get:
-      description: Lists all users.
-      operationId: getUsers
+      description: View all users.
+      operationId: Get Users
       responses:
         '200':
           description: Success
           schema:
             $ref: '#/definitions/users'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
     post:
-      description: Add a user.
-      operationId: addUser
+      description: Create a user.
+      operationId: Create User
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updates for the menu item.
+          schema:
+            $ref: '#/definitions/userDetails'
       responses:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/addUser'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
+            $ref: '#/definitions/user'
   '/users/{user_id}':
     get:
-      description: Lists details of a user.
-      operationId: getUserById
+      description: View details for a user.
+      operationId: Get User By ID
       parameters:
         - name: user_id
           in: path
@@ -52,12 +51,8 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/user'
-        '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/UnauthorizedResponse'
 definitions:
-  addUser:
+  userDetails:
     type: object
     required:
       - username
@@ -94,32 +89,41 @@ definitions:
     type: array
     description: List of users.
     items:
-      $ref: '#/definitions/user'
+      $ref: '#/definitions/userDetails'
   user:
     type: object
+    description: User details
     properties:
-      firstName:
+      uuid:
         type: string
-        description: First name of user.
-      lastName:
+        description: ID of the user.
+      username:
         type: string
-        description: Last name of user.
+        description: Username.
+      email:
+        type: string
+        description: Email for contacting user.
+      activated:
+        type: boolean
+        description: Flag that specifies whether the user is activated.
+      picture:
+        type: string
+        description: URL to user picture.
       address:
         type: string
         description: Street address of user.
       city:
         type: string
         description: City where user resides.
-      region:
+      firstName:
         type: string
-        description: Region or state where user resides.
+        description: First name of user.
+      lastName:
+        type: string
+        description: Last name of user.
       postalCode:
         type: string
         description: Postal code where user resides.
-      email:
+      region:
         type: string
-        description: Email for contacting user.
-  UnauthorizedResponse:
-    properties:
-      message:
-        type: string
+        description: Region or state where user resides.
