@@ -16,7 +16,7 @@ paths:
   '/foodcarts':
     get:
       description: View all food carts.
-      operationId: Get Food Carts
+      operationId: GetFoodCarts
       responses:
         '200':
           description: Success
@@ -24,7 +24,7 @@ paths:
             $ref: '#/definitions/foodcarts'
     post:
       description: Create a food cart.
-      operationId: Create Food Cart
+      operationId: CreateFoodCart
       parameters:
         - name: body
           in: body
@@ -40,7 +40,7 @@ paths:
   '/foodcarts/{cart_id}':
     get:
       description: View food cart details.
-      operationId: Get Food Cart by ID
+      operationId: GetFoodCartbyID
       parameters:
         - name: cart_id
           in: path
@@ -54,7 +54,7 @@ paths:
             $ref: '#/definitions/foodcart'
     put:
       description: Update food cart details.
-      operationId: Update Food Cart
+      operationId: UpdateFoodCart
       parameters:
         - name: cart_id
           in: path
@@ -74,7 +74,7 @@ paths:
             $ref: '#/definitions/foodcart'
     delete:
       description: Delete a food cart.
-      operationId: Delete Food Cart
+      operationId: DeleteFoodCart
       parameters:
         - name: cart_id
           in: path
@@ -89,7 +89,7 @@ paths:
   '/foodcarts/{cart_id}/menus':
     get:
       description: View the menus associated with a food cart.
-      operationId: Get Food Cart Menus
+      operationId: GetFoodCartMenus
       parameters:
         - name: cart_id
           in: path
@@ -103,7 +103,7 @@ paths:
             $ref: '#/definitions/menus'
     post:
       description: Add a menu to a food cart.
-      operationId: Create Food Cart Menu
+      operationId: CreateFoodCartMenu
       parameters:
         - name: cart_id
           in: path
@@ -124,7 +124,7 @@ paths:
   '/foodcarts/{cart_id}/items':
     get:
       description: View menu items associated with a food cart.
-      operationId: Get Food Cart Itesm
+      operationId: GetFoodCartItems
       parameters:
         - name: cart_id
           in: path
@@ -138,7 +138,7 @@ paths:
             $ref: '#/definitions/items'
     post:
       description: Create a menu item to a food cart.
-      operationId: Create Food Cart Item
+      operationId: CreateFoodCartItem
       parameters:
         - name: cart_id
           in: path
