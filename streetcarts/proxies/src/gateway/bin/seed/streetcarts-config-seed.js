@@ -225,7 +225,7 @@ if (args[2] === 'configure-edge') {
                                 function (error, response) {
                                 if (error) {
                                     console.log('\nError creating foodcart: \n' + 
-                                        error);
+                                        JSON.stringify(error));
                                 } else {
                                     return console.log('Foodcarts created');
                                 }
@@ -316,7 +316,9 @@ function createFoodcarts(foodcartsData, usersData, callback) {
             console.log('\nAuthenticating: ' + username);
             authenticateUser(username, password, function (error, response) {
                 if (error) {
-                    callback(error);
+                    console.log('\nError authenticating user: ' + username + '\n ' +
+                        JSON.stringify(error));
+                    callback(error, null);
                 } else {
                     var access_token = JSON.parse(response.body).access_token;
                     
@@ -339,11 +341,11 @@ function createFoodcarts(foodcartsData, usersData, callback) {
                     
                     makeRequest(options, function (error, response) {
                         if (error) {
-                            console.log('\nError creating foodcart: \n' + 
+                            console.log('\nError creating foodcart:\n ' + 
                                 JSON.stringify(error));
                             callback(error, null);
                         } else {
-                           var foodcart;
+                            var foodcart;
                             try {
                                foodcart = JSON.parse(response.body);
                             } catch (exception) {
@@ -372,8 +374,9 @@ function createFoodcarts(foodcartsData, usersData, callback) {
                                             addItemsToMenu(menusUUIDs[0], itemsUUIDs, options,
                                             function (error, response) {
                                                 if (error) {
+                                                    callback(error, null);
                                                 } else {
-                                                    callback(response);
+                                                    callback(null, response);
                                                 }
                                             });
                                         }
