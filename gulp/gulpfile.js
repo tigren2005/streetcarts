@@ -4,7 +4,6 @@ var gutil = require('gulp-util')
 var proxy_name = 'fault-handling-apikey'
 var edge = require('./edge.js')
 var request = require('request');
-var 
 gulp.task('default', function () {
     // place code for your default task here
 });
@@ -170,7 +169,7 @@ var kvms =[ {
 
 var kvmEntries =[ {
     "name": "X-DATA-MANAGER-KEY",
-    "value": "foo",
+    "value": "",
     "mapName": "DATA-MANAGER-API-KEY"
 }]
 
@@ -219,6 +218,7 @@ gulp.task('deploy',[], function () {
         }
     ).then(
         function () {
+//            var consumerKey = "";
             var host = "http://api.enterprise.apigee.com/";
             var org = gutil.env.org;
             var env = gutil.env.env;
@@ -237,13 +237,15 @@ gulp.task('deploy',[], function () {
                     console.log("Could not get data manager app: " + error);
                 } else {
                     console.log("Got data manager app: " + response);
-                    var consumerKey = JSON.parse(response).credentials.consumerKey;
+                    var consumerKey = JSON.parse(response).credentials[0].consumerKey;
+                    console.log("Consumer key: " + consumerKey)
+                    kvmEntries[0].value = consumerKey;
+                    return edge.run(kvmEntries, edge.createKVMEntries)
                 }
             });
-            return edge.run(kvmEntries, edge.createKVMEntries)
         },
         function (err) {
-            console.log('Unable to create KVM: ' + err);
+            console.log('Unable to create KVM: ' + err);            
             return edge.run(kvmEntries, edge.createKVMEntries)
         }
     ).then(
