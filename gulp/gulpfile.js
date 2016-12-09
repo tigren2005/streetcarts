@@ -1,28 +1,23 @@
 var gulp = require('gulp');
+var build = require('gulp-build')
 var apigeetool = require('apigeetool')
 var gutil = require('gulp-util')
-var proxy_name = 'fault-handling-apikey'
 var edge = require('./edge.js')
 var request = require('request');
+
 gulp.task('default', function () {
     // place code for your default task here
 });
 
-var apilist =[ {
-    dir: '../streetcarts/proxies/src/gateway/accesstoken', proxy: 'accesstoken'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/data-manager', proxy: 'data-manager'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/foodcarts', proxy: 'foodcarts'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/items', proxy: 'items'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/menus', proxy: 'menus'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/reviews', proxy: 'reviews'
-}, {
-    dir: '../streetcarts/proxies/src/gateway/users', proxy: 'users'
-}]
+var apilist =[
+    { dir: 'build/gateway/accesstoken', proxy: 'accesstoken' }, 
+    { dir: 'build/gateway/data-manager', proxy: 'data-manager' }, 
+    { dir: 'build/gateway/foodcarts', proxy: 'foodcarts' }, 
+    { dir: 'build/gateway/items', proxy: 'items' }, 
+    { dir: 'build/gateway/menus', proxy: 'menus' }, 
+    { dir: 'build/gateway/reviews', proxy: 'reviews' }, 
+    { dir: 'build/gateway/users', proxy: 'users' }
+]
 
 var apiProducts =[ {
     "apiResources":[ "/"],
@@ -173,30 +168,51 @@ var kvmEntries =[ {
     "mapName": "DATA-MANAGER-API-KEY"
 }]
 
-gulp.task('deploy',[], function () {
-    return edge.run(apilist, edge.deployApis
-    ).then(
-        function () {
-            return edge.run(developers, edge.createDevelopers)
-        },
-        function () {
-            console.log('API deploy failed: ' + err);
-            return edge.run(developers, edge.createDevelopers)
-        }
-    ).then (
-        function () {
+//    dir: '../streetcarts/proxies/src/gateway/data-manager', proxy: 'data-manager'
+
+
+gulp.task('build',function(){    
+//    var opts = baseopts()
+    var baas_org = gutil.env.usergrid_org;
+    var baas_app = gutil.env.usergrid_app;
+    var baas_api = gutil.env.baas_api;
+    
+    console.log('BaaS org: ' + baas_org);
+    
+    var replace_opts = {
+        BAASAPIREPLACE: baas_api,
+        BAASORGREPLACE: baas_org,
+        BAASAPPREPLACE: baas_app
+    }
+    new Promise(function(resolve,reject){
+        gulp.src('../streetcarts/proxies/src/gateway/**/*')
+        .pipe(gulp.dest('build/gateway'))
+        .on('end',resolve)
+    }).then(function(){
+        gulp.src('build/gateway/data-manager/apiproxy/resources/node/data-manager.js')        
+        .pipe(build(replace_opts))
+        .pipe(gulp.dest('build/gateway/data-manager/apiproxy/resources/node'))
+    })        
+})
+
+gulp.task('deploy',['build'], function(){
             return edge.run(apilist, edge.deployApis)
+    .then(
+        function () {
+            return edge.run(developers, edge.createDevelopers)
         },
         function (err) {
-            console.log('Developer creation failed: ' + err);
-            return edge.run(apilist, edge.deployApis)
+            console.log('Unable to deploy APIs. Moving on to create developers.\n' + 
+                err);
+            return edge.run(developers, edge.createDevelopers)            
         }
     ).then(
         function () {
             return edge.run(apiProducts, edge.createProducts)
         },
         function (err) {
-            console.log('API creation failed, continue: ' + err);
+            console.log('Unable to create developers. Moving on to create create products.\n' + 
+                err);
             return edge.run(apiProducts, edge.createProducts)
         }
     ).then(
@@ -204,16 +220,17 @@ gulp.task('deploy',[], function () {
             return edge.run(apps, edge.createApps)
         },
         function (err) {
-            console.log('Product creation failed: ' + err);
+            console.log('Unable to create products. Moving on to create apps.\n' + 
+                err);
             return edge.run(apps, edge.createApps)
         }
     ).then(
-        function (app) {
-            console.log('Created app: ' + app);
+        function () {
             return edge.run(kvms, edge.createKVMs)
         },
         function (err) {
-            console.log('App creation failed: ' + err);
+            console.log('Unable to create apps. Moving on to create key-value maps.\n' + 
+                err);
             return edge.run(kvms, edge.createKVMs)
         }
     ).then(
@@ -231,16 +248,44 @@ gulp.task('deploy',[], function () {
                 },
                 method: "GET"
             };
-            var dataManagerApp;
             makeRequest(options, function (error, response) {
                 if (error) {
-                    console.log("Could not get data manager app: " + error);
+                    console.log("\nCould not get data manager app: " + error);
                 } else {
-                    console.log("Got data manager app: " + response);
+                    console.log("\nGot data manager app");
                     var consumerKey = JSON.parse(response).credentials[0].consumerKey;
-                    console.log("Consumer key: " + consumerKey)
                     kvmEntries[0].value = consumerKey;
                     return edge.run(kvmEntries, edge.createKVMEntries)
+                }
+            });
+        },
+        function (err) {
+            console.log('\nUnable to create KVM: ' + err);            
+            return edge.run(kvmEntries, edge.createKVMEntries)
+        }
+    ).then(
+        function () {
+            var host = "http://api.enterprise.apigee.com/";
+            var org = gutil.env.org;
+            var env = gutil.env.env;
+            var rev = '1';
+            
+            var uri = host + 'v1/o/' + org + '/apis/data-manager/revisions/' + rev + '/npm';
+            
+            var options = {
+                uri: uri,
+                auth: {
+                    'bearer': gutil.env.token
+                },
+                method: "POST",
+                form: { command:'install' }
+            };
+            
+            makeRequest(options, function (error, response) {
+                if (error) {
+                    console.log("Could not install node modules: " + error.message);
+                } else {
+                    console.log("Installed node modules.");
                 }
             });
         },
@@ -264,8 +309,8 @@ gulp.task('clean',function() {
             return edge.run(developers, edge.deleteDevelopers)
         },
         function(err){ 
-            console.log('App delete failed: ' + err);            
-            return edge.run(developers, edge.deleteDevelopers) 
+            console.log('App delete failed: ' + err);
+            return edge.run(developers, edge.deleteDevelopers)
         }
     ).then(
         function(){ 
@@ -300,7 +345,7 @@ function makeRequest(options, callback) {
 
     request(options, function (error, response, body) {
             console.log("error: " + error);
-            console.log("response: " + JSON.stringify(response));
+//            console.log("response: " + JSON.stringify(response));
             console.log("body: " + body);
         
         var errorObject = new Error();

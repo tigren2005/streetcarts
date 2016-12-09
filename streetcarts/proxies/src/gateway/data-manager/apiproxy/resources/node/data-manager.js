@@ -2,8 +2,8 @@ var request = require('request');
 var async = require('async');
 var apigee = require('apigee-access'); 
 
-var host = 'BAASAPIREPLACE';
-var appPath = '/BAASORGREPLACE/BAASAPPREPLACE';
+var host = '{{BAASAPIREPLACE}}';
+var appPath = '/{{BAASORGREPLACE}}/{{BAASAPPREPLACE}}';
 
 // Name and scope for the Edge vault containing 
 // API BaaS credentials.

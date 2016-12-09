@@ -151,15 +151,6 @@ function createKVMEntries(entry,cb){
     cb(null,sdk.addEntryToKVM(opts))
 }
 
-//function deleteKVMEntries(entry,cb){
-//    var sdk = apigeetool.getPromiseSDK()
-//    var opts = baseopts()
-//    console.log('deleting KVM ' + kvm.name)
-//    opts.mapName = entry.name
-//    console.log(opts)
-//    cb(null,sdk.deleteKVM(opts))
-//}
-
 function run(arr, func){ 
     var defer=q.defer();
     async.mapSeries(arr,function(c,cb){
@@ -188,7 +179,7 @@ function baseopts () {
         token: gutil.env.token,
         environments: gutil.env.env,    
         environment: gutil.env.env,
-        debug: gutil.env.debug ,
+        debug: gutil.env.debug,
         usergrid_org: gutil.env.ug_org,   
         usergrid_app: gutil.env.ug_app,
         usergrid_client_id: gutil.env.ug_client_id,
