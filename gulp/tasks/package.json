@@ -10,15 +10,9 @@
     "test": "mocha "
   },
   "dependencies": {
-    "apigeetool": "mukundha/apigeetool-node",
     "async": "*",
-    "gulp": "*",
-    "gulp-build": "^0.5.3",
     "gulp-util": "^3.0.7",
-    "q": "*",
-    "request": "^2.65.0",
-    "require-dir": "0.3.1",
-    "sleep": "^3.0.1"
+    "q": "*"
   },
   "author": "straut@google.com",
   "license": "ISC"

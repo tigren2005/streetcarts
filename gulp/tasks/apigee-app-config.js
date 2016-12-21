@@ -35,6 +35,7 @@ module.exports = {
                     },
                     method: "DELETE"
                 };
+                
                 // To keep things clean, delete the vault if it's there.
                 deleteVault(vaultName, options, function(error, response){
                     if (error) {
@@ -141,21 +142,17 @@ module.exports = {
         }
     },
 
-    createBaasCollections: function (configOptions, callback) {
+    createBaasCollections: function (options, callback) {
+        var collections = options.collections;
 
-        var baasConfig = configOptions.config.apiBaaS;
+        var clientId = options.usergrid_client_id;
+        var clientSecret = options.usergrid_secret;
+        var orgName = options.usergrid_org;
+        var appName = options.usergrid_app;
+        var apiBaaSHost = options.usergrid_host;
         
-        var clientId = baasConfig.clientCredentials.clientId;
-        var clientSecret = baasConfig.clientCredentials.clientSecret;
-        
-        var apiBaaSHost = baasConfig.apiHost;
-        var orgName = baasConfig.orgName;
-        var appName = baasConfig.appName;
-        
-        if (baasConfig.collections && baasConfig.collections.length > 0)
-        {
-            var collections = baasConfig.collections;
-            
+        if (collections && collections.length > 0)
+        {            
             async.each(collections, function (collection, callback) {
                 var collectionName = collection.name;
                 

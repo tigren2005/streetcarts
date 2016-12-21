@@ -1,6 +1,7 @@
 [{
     "cartName": "The Grilled Cheese Grill",
     "url": "http://grilledcheesegrill.com/",
+    "ownerEmail": "lizzie@example.com",
     "location": {
         "address": "1027 NE Alberta St",
         "city": " Portland",
@@ -18,6 +19,7 @@
 {
     "cartName": "The Whole Bowl",
     "url": "http://www.thewholebowl.com/what.html/",
+    "ownerEmail": "steef@example.com",
     "location": {
         "address": "1100 NW Glisan St",
         "city": " Portland",
@@ -35,6 +37,7 @@
 {
     "cartName": "Korean Twist on 5th",
     "url": "",
+    "ownerEmail": "freewill@example.com",
     "location": {
         "address": "",
         "city": " Portland",
@@ -52,6 +55,7 @@
 {
     "cartName": "Honkin' Huge Burritos!",
     "url": "http://www.honkinhuge.com/",
+    "ownerEmail": "wilyone@example.com",
     "location": {
         "address": "",
         "city": " Portland",
@@ -69,6 +73,7 @@
 {
     "cartName": "El Cubo de Cuba",
     "url": "http://www.facebook.com/profile.php?id=100001488674001#!/profile.php?id=100001488674001",
+    "ownerEmail": "floydster@example.com",
     "location": {
         "address": "",
         "city": " Portland",
