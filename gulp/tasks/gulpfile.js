@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var build = require('gulp-build')
 var apigeetool = require('apigeetool')
 var gutil = require('gulp-util')
-var baas = require('./baas.js')
+// var baas = require('./baas.js')
 var request = require('request')
 
 var foodcarts = [
@@ -154,6 +154,38 @@ var roles = [
         ]
     }
 ];
+
+// This code should check first to make sure that the Edge pieces
+// have been set up -- as in:
+// gulp.task('seed',['configure-permissions',['verify-api']], function(){
+
+/**
+	seed should first:
+	- verify APIs have been deployed
+		- or just handle the case where they haven't with an error message
+	
+	// set up permissions
+	- create groups.then
+	- create roles.then
+	- assign roles to groups
+	
+	// create owners
+	- add owner user accounts
+		- get owner emails from user JSON, create account as each
+	
+	// create foodcarts
+	- add foodcart for each owner
+		- for each foodcart, get owner email from JSON, log in as that owner, 
+			then create the foodcart
+	- add items, menus for each foodcart
+		- create items.then
+		- create menus
+	
+	// create users
+	- add other non-owners as users of a foodcart
+	
+*/
+
 
 gulp.task('seed', function(){
     return baas.createUsers(users)

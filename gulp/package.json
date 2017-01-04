@@ -12,6 +12,7 @@
   "dependencies": {
     "apigeetool": "mukundha/apigeetool-node",
     "async": "*",
+	"del": "^2.2.2",
     "gulp": "*",
     "gulp-build": "^0.5.3",
     "gulp-util": "^3.0.7",

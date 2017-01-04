@@ -57,7 +57,8 @@ if (args[2] === 'configure-edge') {
                             "config": apigeeConfig
                         };
                         
-                        apigeeAppConfig.createVaults(options, function (error, response) {
+                        apigeeAppConfig.createVaults(options, function (error,
+							response) {
                             if (error) {
                                 if (error.statusCode === 500) {
                                     
@@ -89,9 +90,11 @@ if (args[2] === 'configure-edge') {
                 var options = {
                     "config": apigeeConfig
                 };
-                apigeeAppConfig.createBaasCollections(options, function (error, response) {
+                apigeeAppConfig.createBaasCollections(options, function (error, 
+					response) {
                     if (error) {
-                        console.log('\nGot create collections error: \n' + JSON.stringify(error));
+                        console.log('\nGot create collections error: \n' + 
+						JSON.stringify(error));
                     } else {
                         // console.log('\nRoles created.');
                     }
@@ -101,9 +104,11 @@ if (args[2] === 'configure-edge') {
                 var options = {
                     "config": apigeeConfig
                 };
-                apigeeAppConfig.createBaasRoles(options, function (error, response) {
+                apigeeAppConfig.createBaasRoles(options, function (error, 
+					response) {
                     if (error) {
-                        console.log('\nGot create roles error: \n' + JSON.stringify(error));
+                        console.log('\nGot create roles error: \n' + 
+						JSON.stringify(error));
                     } else {
                         // console.log('\nRoles created.');
                     }
@@ -113,12 +118,14 @@ if (args[2] === 'configure-edge') {
                 var options = {
                     "config": apigeeConfig
                 };
-                apigeeAppConfig.createBaasGroups(options, function (error, response) {
+                apigeeAppConfig.createBaasGroups(options, function (error, 
+					response) {
                     if (error) {
                         console.log('\nError while creating API BaaS groups: \n' + 
                             error);
                     } else {
-                        async.each(baasConfig.groups, function (group, callback) {
+                        async.each(baasConfig.groups, function (group, 
+							callback) {
                             if (group.roles) {
                                 var options = {
                                     "config": apigeeConfig

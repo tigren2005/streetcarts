@@ -6,6 +6,7 @@ var gutil = require('gulp-util')
 var edge = require('./edge.js')
 var request = require('request');
 var requireDir = require('require-dir')
+var del = require('del');
 var tasksDir = requireDir('./tasks')
 
 gulp.task('default', function () {
@@ -23,22 +24,23 @@ var apilist =[
 ]
 
 var apiProducts =[ {
-    "apiResources":[ "/"],
-    "approvalType": "auto",
-    "attributes":[ {
-        "name": "access",
-        "value": "public"
+    apiResources:["/"],
+    approvalType: "auto",
+    attributes:[ {
+        name: "access",
+        value: "public"
     }],
-    "displayName": "SC-PRODUCT-UNLIMITED",
-    "name": "SC-PRODUCT-UNLIMITED",
-    "environments":[ 
+    displayName: "SC-PRODUCT-UNLIMITED",
+    description: "SC-PRODUCT-UNLIMITED",
+    name: "SC-PRODUCT-UNLIMITED",
+    environments:[ 
         "test", 
         "prod"
     ],
-    "quota": "1000000",
-    "quotaInterval": "1",
-    "quotaTimeUnit": "second",
-    "scopes":[
+    quota: "1000000",
+    quotaInterval: "1",
+    quotaTimeUnit: "second",
+    scopes:[
         "owner.read",
         "owner.create",
         "owner.update",
@@ -48,7 +50,7 @@ var apiProducts =[ {
         "manager.update",
         "manager.read"
     ],
-    "proxies":[
+    proxies:[
         "foodcarts",
         "menus",
         "items",
@@ -56,34 +58,34 @@ var apiProducts =[ {
         "accesstoken"
     ]
 }, {
-    "apiResources":["/"],
-    "approvalType": "auto",
-    "attributes":[ {
-        "name": "access",
-        "value": "public"
+    apiResources:["/"],
+    approvalType: "auto",
+    attributes:[ {
+        name: "access",
+        value: "public"
     }],
-    "displayName": "SC-PRODUCT-TRIAL",
-    "name": "SC-PRODUCT-TRIAL",
-    "environments":[
+    displayName: "SC-PRODUCT-TRIAL",
+    name: "SC-PRODUCT-TRIAL",
+    environments:[
         "test",
         "prod"
     ],
-    "scopes":[
+    scopes:[
         "openid",
         "atms",
         "branches"
     ],
-    "proxies":[
+    proxies:[
         "foodcarts",
         "menus",
         "items",
         "users",
         "accesstoken"
     ],
-    "quota": "1000",
-    "quotaInterval": "1",
-    "quotaTimeUnit": "day",
-    "scopes":[
+    quota: "1000",
+    quotaInterval: "1",
+    quotaTimeUnit: "day",
+    scopes:[
         "owner.read",
         "owner.create",
         "owner.update",
@@ -94,99 +96,103 @@ var apiProducts =[ {
         "manager.read"
     ]
 }, {
-    "apiResources":[
+    apiResources:[
         "/PUT/v1/streetcarts/data-manager/**",
         "/DELETE/v1/streetcarts/data-manager/**",
         "/POST/v1/streetcarts/data-manager/**",
         "/GET/v1/streetcarts/data-manager/**"
     ],
-    "approvalType": "auto",
-    "attributes":[ {
-        "name": "access",
-        "value": "public"
+    approvalType: "auto",
+    attributes:[ {
+        name: "access",
+        value: "public"
     }],
-    "description": "",
-    "displayName": "SC-DATA-MANAGER-PRODUCT",
-    "environments":[
+    description: "",
+    displayName: "SC-DATA-MANAGER-PRODUCT",
+    environments:[
         "test",
         "prod"
     ],
-    "name": "SC-DATA-MANAGER-PRODUCT",
-    "proxies":[
+    name: "SC-DATA-MANAGER-PRODUCT",
+    proxies:[
         "data-manager"
     ],
-    "scopes":[""]
+    scopes:[]
 }]
 
 var developers =[ {
-    "email": "streetcarts-developer@example.com",
-    "firstName": "StreetCarts",
-    "lastName": "Developer",
-    "userName": "streetcartsdev",
-    "status": "active"
+    email: "streetcarts-developer@example.com",
+    firstName: "StreetCarts",
+    lastName: "Developer",
+    userName: "streetcartsdev",
+    status: "active"
 }]
+// var developers =[ {
+//     "email": "streetcarts-developer@example.com",
+//     "firstName": "StreetCarts",
+//     "lastName": "Developer",
+//     "userName": "streetcartsdev",
+//     "status": "active"
+// }]
 
 var apps =[ {
-    "name": "SC-APP-UNLIMITED",
-    "apiProducts": "SC-PRODUCT-UNLIMITED",
-    "attributes":[ {
-        "name": "DisplayName",
-        "value": "SC-APP-UNLIMITED"
+    name: "SC-APP-UNLIMITED",
+    apiProducts: "SC-PRODUCT-UNLIMITED",
+    attributes:[ {
+        name: "DisplayName",
+        value: "SC-APP-UNLIMITED"
     }],
-    "callbackUrl": 'http://streetcarts.com',
-    "email": "streetcarts-developer@example.com",
-    "keyExpiresIn": "100000000000",
-    "scopes":[]
+    callback: "http://streetcarts.com",
+    email: "streetcarts-developer@example.com",
+    keyExpiresIn: "100000000000"
 }, {
-    "name": "SC-APP-TRIAL",
-    "apiProducts": "SC-PRODUCT-TRIAL",
-    "attributes":[ {
-        "name": "DisplayName",
-        "value": "SC-APP-TRIAL"
+    name: "SC-APP-TRIAL",
+    apiProducts: "SC-PRODUCT-TRIAL",
+    attributes:[ {
+        name: "DisplayName",
+        value: "SC-APP-TRIAL"
     }],
-    "callbackUrl": "http://streetcarts.com",
-    "email": "streetcarts-developer@example.com",
-    "keyExpiresIn": "100000000000",
-    "scopes":[]
+    callback: "http://streetcarts.com",
+    email: "streetcarts-developer@example.com",
+    keyExpiresIn: "100000000000"
 }, {
-    "name": "SC-DATA-MANAGER-APP",
-    "apiProducts": "SC-DATA-MANAGER-PRODUCT",
-    "attributes":[ {
-        "name": "DisplayName",
-        "value": "SC-DATA-MANAGER-APP"
+    name: "SC-DATA-MANAGER-APP",
+    apiProducts: "SC-DATA-MANAGER-PRODUCT",
+    attributes:[ {
+        name: "DisplayName",
+        value: "SC-DATA-MANAGER-APP"
     }],
-    "callbackUrl": "http://streetcarts.com",
-    "email": "streetcarts-developer@example.com",
-    "keyExpiresIn": "100000000000",
-    "scopes":[]
+    callback: "http://streetcarts.com",
+    email: "streetcarts-developer@example.com",
+    keyExpiresIn: "100000000000"
 }]
 
 var kvms = [ {
-    "name": "DATA-MANAGER-API-KEY"
+    name: "DATA-MANAGER-API-KEY"
 }]
 
 var kvmEntries = [ {
-    "name": "X-DATA-MANAGER-KEY",
-    "value": "",
-    "mapName": "DATA-MANAGER-API-KEY"
+    name: "X-DATA-MANAGER-KEY",
+    value: "",
+    mapName: "DATA-MANAGER-API-KEY"
 }]
 
 var vaultEntries = [
     {
-        "name": "streetcarts",
-        "scope": "environment",
-        "entries" :[
+        name: "streetcarts",
+        scope: "environment",
+        entries :[
             {
-                "name": "datastore-client-id",
-                "value": gutil.env.usergrid_client_id
+                name: "datastore-client-id",
+                value: gutil.env.usergrid_client_id
             },
             {
-                "name": "datastore-client-secret",
-                "value": gutil.env.usergrid_secret
+                name: "datastore-client-secret",
+                value: gutil.env.usergrid_secret
             },
             {
-                "name": "datastore-client-token",
-                "value": ""
+                name: "datastore-client-token",
+                value: ""
             }
         ]
     }
@@ -194,6 +200,12 @@ var vaultEntries = [
 
 //    dir: '../streetcarts/proxies/src/gateway/data-manager', proxy: 'data-manager'
 
+gulp.task('clean-build', function () {
+
+    // Delete Temp Files & Folders
+    return del(['build/**']);
+
+});
 
 gulp.task('build',function(){    
 //    var opts = baseopts()
@@ -208,7 +220,7 @@ gulp.task('build',function(){
         BAASORGREPLACE: baas_org,
         BAASAPPREPLACE: baas_app
     }
-    new Promise(function(resolve,reject){
+    return new Promise(function(resolve,reject){
         gulp.src('../streetcarts/proxies/src/gateway/**/*')
         .pipe(gulp.dest('build/gateway'))
         .on('end',resolve)
@@ -216,10 +228,10 @@ gulp.task('build',function(){
         gulp.src('build/gateway/data-manager/apiproxy/resources/node/data-manager.js')        
         .pipe(build(replace_opts))
         .pipe(gulp.dest('build/gateway/data-manager/apiproxy/resources/node'))
-    })        
+    })
 })
 
-gulp.task('deploy',['build'], function(){
+gulp.task('deploy',['clean-build', 'build'], function(){
             return edge.run(apilist, edge.deployApis)
     .then(
         function () {
@@ -236,9 +248,9 @@ gulp.task('deploy',['build'], function(){
             return edge.run(apiProducts, edge.createProducts)
         },
         function (err) {
-            console.log('Unable to create developers. ' + 
-                'Moving on to create create products.\n' + 
-                err);
+        	console.log('Unable to create developers. ' + 
+            	'Moving on to create create products.\n' + 
+            	err);
             return edge.run(apiProducts, edge.createProducts)
         }
     ).then(
@@ -246,9 +258,9 @@ gulp.task('deploy',['build'], function(){
             return edge.run(apps, edge.createApps)
         },
         function (err) {
-            console.log('Unable to create products. ' + 
-                'Moving on to create apps.\n' + 
-                err);
+    		console.log('Unable to create products. ' +  
+        		'Moving on to create apps.\n' + 
+        		err);
             return edge.run(apps, edge.createApps)
         }
     ).then(
@@ -384,9 +396,9 @@ gulp.task('deploy',['build'], function(){
             },
             function (error) {
                 if (error) {
-                    callback(error, null);
+                    // callback(error, null);
                 } else {
-                    callback(null, 'Added vault entries.');
+                    // callback(null, 'Added vault entries.');
                 }
             });
         },

@@ -289,8 +289,8 @@ module.exports = {
                 var roleTitle = role.title;
                 var roleName = role.name;
                 
-                var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + appName + 
-                    '/roles/' + roleName + '?client_id=' + clientId + 
+                var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + 
+				appName + '/roles/' + roleName + '?client_id=' + clientId + 
                     '&client_secret=' + clientSecret;
                 
                 // To keep things clean, delete the role if it's there.

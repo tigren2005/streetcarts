@@ -1,3 +1,9 @@
+/*
+
+This file seeds the data store with code that calls APIs
+that would be used by app clients in less batch-y ways.
+*/
+
 var q = require('q');
 var async = require('async');
 var gutil = require('gulp-util');

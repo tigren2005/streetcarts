@@ -48,18 +48,18 @@ function deleteProducts(prod,cb) {
 
 function createProducts (prod,cb) {
     var sdk = apigeetool.getPromiseSDK()
-   var opts = baseopts()
+    var opts = baseopts()
     prod.productName = prod.name,
         opts.productDesc = prod.displayName
         var proxies = ''
-        for(var p in prod.proxies) proxies += prod.proxies[p] +','
+        for(var p in prod.proxies) proxies += prod.proxies[p] + ','
         opts.proxies = proxies
         var env = ''
         for(var e in prod.environments) env += prod.environments[e] + ','
         opts.environments = env
         var scopes = ''
         for(var s in prod.scopes) scopes += prod.scopes[s] + ','
-        opts.scopes =s 
+        opts.scopes = scopes 
         opts.productName = prod.name        
         cb(null,sdk.createProduct(opts))
 }
