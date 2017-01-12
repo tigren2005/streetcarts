@@ -51,23 +51,23 @@ function createProducts (prod,cb) {
     var opts = baseopts()
     prod.productName = prod.name,
         opts.productDesc = prod.displayName
-        var proxies = ''
-        for(var p in prod.proxies) proxies += prod.proxies[p] + ','
-        opts.proxies = proxies
-        var apiResources = ''
-        for(var r in prod.apiResources) apiResources += prod.apiResources[r] + ','
-        opts.apiResources = apiResources 
-        var env = ''
-        for(var e in prod.environments) env += prod.environments[e] + ','
-        opts.environments = env
-        var scopes = ''
-        for(var s in prod.scopes) scopes += prod.scopes[s] + ','
-        opts.scopes = scopes 
-		opts.quota = prod.quota
-		opts.quotaInterval = prod.quotaInterval
-		opts.quotaTimeUnit = prod.quotaTimeUnit
-        opts.productName = prod.name        
-        cb(null,sdk.createProduct(opts))
+    var proxies = ''
+    for(var p in prod.proxies) proxies += prod.proxies[p] + ','
+    opts.proxies = proxies
+    var apiResources = ''
+    for(var r in prod.apiResources) apiResources += prod.apiResources[r] + ','
+    opts.apiResources = apiResources 
+    var env = ''
+    for(var e in prod.environments) env += prod.environments[e] + ','
+    opts.environments = env
+    var scopes = ''
+    for(var s in prod.scopes) scopes += prod.scopes[s] + ','
+    opts.scopes = scopes 
+	opts.quota = prod.quota
+	opts.quotaInterval = prod.quotaInterval
+	opts.quotaTimeUnit = prod.quotaTimeUnit
+    opts.productName = prod.name        
+    cb(null,sdk.createProduct(opts))
 }
 
 function createDevelopers (dev,cb) {

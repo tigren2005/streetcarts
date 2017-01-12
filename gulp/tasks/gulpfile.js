@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var build = require('gulp-build')
 var apigeetool = require('apigeetool')
 var gutil = require('gulp-util')
-// var baas = require('./baas.js')
+var baas = require('./baas.js')
 var request = require('request')
 
 var foodcarts = [
@@ -157,7 +157,7 @@ var roles = [
 
 // This code should check first to make sure that the Edge pieces
 // have been set up -- as in:
-// gulp.task('seed',['configure-permissions',['verify-api']], function(){
+// gulp.task('seed',['configure-permissions','verify-api'], function(){
 
 /**
 	seed should first:
@@ -186,6 +186,38 @@ var roles = [
 	
 */
 
+gulp.task('configure-baas', function() {
+    return baas.createGroups(groups)
+	.then(
+        function() {
+            console.log('Created groups');
+            return baas.createRoles(roles)
+        },
+        function(error) { 
+            console.log('Failed to create groups: ' + error);
+            return baas.createRoles(roles)
+        }
+	).then(
+        function() {
+            console.log('Created roles');
+            return baas.assignRolesToGroups(groups)
+        },
+        function(error) { 
+            console.log('Failed to create roles: ' + error);
+            return baas.assignRolesToGroups(groups)
+        }
+    ).then(
+        function () {
+            console.log('Assigned roles to groups.')
+            console.log('All done.')
+        },
+        function (error) {
+            console.log('Failed to assign roles to groups.')
+            console.log(error)
+        }
+    )
+})
+
 
 gulp.task('seed', function(){
     return baas.createUsers(users)
@@ -193,10 +225,10 @@ gulp.task('seed', function(){
         function () {
             return edge.run(developers, edge.createDevelopers)
         },
-        function (err) {
+        function (error) {
             console.log('Unable to deploy APIs. ' + 
                 'Moving on to create developers.\n' + 
-                err);
+                error);
             return edge.run(developers, edge.createDevelopers)            
         }
     ).then(

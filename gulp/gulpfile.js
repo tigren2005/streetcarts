@@ -4,6 +4,7 @@ var apigeetool = require('apigeetool')
 var async = require('async')
 var gutil = require('gulp-util')
 var edge = require('./edge.js')
+var edgeUtil = require('./edge-util.js')
 var request = require('request');
 var requireDir = require('require-dir')
 var del = require('del');
@@ -23,7 +24,8 @@ var apilist =[
     { dir: 'build/gateway/users', proxy: 'users' }
 ]
 
-var apiProducts =[ {
+var apiProducts =[ 
+	{
     apiResources:["/"],
     approvalType: "auto",
     attributes:[ {
@@ -57,7 +59,8 @@ var apiProducts =[ {
         "users",
         "accesstoken"
     ]
-}, {
+}, 
+{
     apiResources:["/"],
     approvalType: "auto",
     attributes:[ {
@@ -95,7 +98,8 @@ var apiProducts =[ {
         "manager.update",
         "manager.read"
     ]
-}, {
+}, 
+{
     apiResources:[
         "/PUT/v1/streetcarts/data-manager/**",
         "/DELETE/v1/streetcarts/data-manager/**",
@@ -127,13 +131,6 @@ var developers =[ {
     userName: "streetcartsdev",
     status: "active"
 }]
-// var developers =[ {
-//     "email": "streetcarts-developer@example.com",
-//     "firstName": "StreetCarts",
-//     "lastName": "Developer",
-//     "userName": "streetcartsdev",
-//     "status": "active"
-// }]
 
 var apps =[ {
     name: "SC-APP-UNLIMITED",
@@ -145,7 +142,8 @@ var apps =[ {
     callback: "http://streetcarts.com",
     email: "streetcarts-developer@example.com",
     keyExpiresIn: "100000000000"
-}, {
+}, 
+{
     name: "SC-APP-TRIAL",
     apiProducts: "SC-PRODUCT-TRIAL",
     attributes:[ {
@@ -155,7 +153,8 @@ var apps =[ {
     callback: "http://streetcarts.com",
     email: "streetcarts-developer@example.com",
     keyExpiresIn: "100000000000"
-}, {
+}, 
+{
     name: "SC-DATA-MANAGER-APP",
     apiProducts: "SC-DATA-MANAGER-PRODUCT",
     attributes:[ {
@@ -177,7 +176,7 @@ var kvmEntries = [ {
     mapName: "DATA-MANAGER-API-KEY"
 }]
 
-var vaultEntries = [
+var vaults = [
     {
         name: "streetcarts",
         scope: "environment",
@@ -198,13 +197,10 @@ var vaultEntries = [
     }
 ]
 
-//    dir: '../streetcarts/proxies/src/gateway/data-manager', proxy: 'data-manager'
-
 gulp.task('clean-build', function () {
 
     // Delete Temp Files & Folders
-    return del(['build/**']);
-
+    return del(['./build/**']);
 });
 
 gulp.task('build',function(){    
@@ -213,7 +209,7 @@ gulp.task('build',function(){
     var baas_app = gutil.env.usergrid_app;
     var baas_api = gutil.env.baas_api;
     
-    console.log('BaaS org: ' + baas_org);
+    // console.log('BaaS org: ' + baas_org);
     
     var replace_opts = {
         BAASAPIREPLACE: baas_api,
@@ -258,8 +254,8 @@ gulp.task('deploy',['clean-build', 'build'], function(){
             return edge.run(apps, edge.createApps)
         },
         function (err) {
-    		console.log('Unable to create products. ' +  
-        		'Moving on to create apps.\n' + 
+    		console.log('Unable to create products. ' +
+        		'Moving on to create apps.\n' +
         		err);
             return edge.run(apps, edge.createApps)
         }
@@ -268,19 +264,19 @@ gulp.task('deploy',['clean-build', 'build'], function(){
             return edge.run(kvms, edge.createKVMs)
         },
         function (err) {
-            console.log('Unable to create apps. ' + 
-                'Moving on to create key-value maps.\n' + 
+            console.log('Unable to create apps. ' +
+                'Moving on to create key-value maps.\n' +
                 err);
             return edge.run(kvms, edge.createKVMs)
         }
     ).then(
         function () {
-            var host = "http://api.enterprise.apigee.com/";
+            var host = gutil.env.host;
             var org = gutil.env.org;
             var env = gutil.env.env;
             var uri = host + "v1/o/" + org +
                 "/developers/streetcarts-developer@example.com/apps/SC-DATA-MANAGER-APP";
-            console.log("GET from uri: " + uri);
+            // console.log("GET from uri: " + uri);
             var options = {
                 uri: uri,
                 auth: {
@@ -288,6 +284,7 @@ gulp.task('deploy',['clean-build', 'build'], function(){
                 },
                 method: "GET"
             };
+			
             makeRequest(options, function (error, response) {
                 if (error) {
                     console.log("\nCould not get data manager app: " +
@@ -302,110 +299,28 @@ gulp.task('deploy',['clean-build', 'build'], function(){
             });
         },
         function (err) {
-            console.log('\nUnable to create KVM: ' + err);            
-//            return edge.run(kvmEntries, edge.createKVMEntries)
+           console.log('\nUnable to create KVM: ' + err);            
+           return edge.run(kvmEntries, edge.createKVMEntries)
         }
     ).then(
         function () {
-            var host = "http://api.enterprise.apigee.com/";
-            var org = gutil.env.org;
-            var env = gutil.env.env;
-            var rev = '1';
-            
-            var uri = host + 'v1/o/' + org + 
-                '/apis/data-manager/revisions/' + rev + '/npm';
-            
-            var options = {
-                uri: uri,
-                auth: {
-                    'bearer': gutil.env.token
-                },
-                method: "POST",
-                form: { command:'install' }
-            };
-
-            makeRequest(options, function (error, response) {
-                if (error) {
-                    console.log("Could not install node modules: " + 
-                        error.message);
-                } else {
-                    console.log("Installed node modules.");
-                }
-            });
+            return edgeUtil.installNodeModules()
         },
         function (err) {
-            console.log('Unable to create KVM entries: ' + 
-                'Moving on to create vaults.\n' + err);
-        }
-    ).then(
-        function () {
-            var host = "http://api.enterprise.apigee.com/";
-            var org = gutil.env.org;
-            var env = '/vaults';
-            var vaultName = '/entries';
-            
-            var uri = host + 'v1/' +
-                'o/' + org + 
-                'e' + env + 
-                vaultName + '/entries';
-            
-            var options = {
-                uri: uri,
-                auth: {
-                    'bearer': gutil.env.token
-                },
-                method: "POST"
-            };
-
-            async.each(vaultEntries, function (vaultEntry,
-                callback) {
-            
-                var entryName = vaultEntry.name;
-                var entryValue = vaultEntry.value;
-                
-                var body = {
-                    "name": entryName,
-                    "value": entryValue
-                };
-                
-                var options = {
-                    uri: uri,
-                    body: JSON.stringify(body),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    auth: {
-                        'bearer': gutil.env.token
-                    },
-                    method: "POST"
-                };
-                
-                console.log('\nAdding vault entry: ' +
-                    entryName);
-                
-                makeRequest(options, function (error,
-                    response) {
-                    if (error && error.statusCode != '201')
-                    {
-                        callback(error, null);
-                    } else {
-                        var responseBody = response.body;
-                        callback(null, responseBody);
-                    }
-                });
-            },
-            function (error) {
-                if (error) {
-                    // callback(error, null);
-                } else {
-                    // callback(null, 'Added vault entries.');
-                }
-            });
-        },
-        function (err) {
-            console.log('Unable to install node modules. ' + 
+            console.log('Unable to create apps. ' +
+                'Moving on to create key-value maps.\n' +
                 err);
-            return edge.run(kvms, edge.createKVMs)
+            return edgeUtil.installNodeModules()
+        }
+    ).then(
+        function () {
+            return edgeUtil.createVaults(vaults)
+        },
+        function (err) {
+            console.log('Unable to install Node modules. ' +
+                'Moving on to create create vaults.\n' +
+                err);
+            return edgeUtil.createVaults(vaults)
         }
     ).then(
         function () {
@@ -456,12 +371,12 @@ gulp.task('clean',function() {
 
 function makeRequest(options, callback) {
 
-    console.log("Making an API request: " + JSON.stringify(options));
+    // console.log("Making an API request: " + JSON.stringify(options));
 
     request(options, function (error, response, body) {
-            console.log("error: " + error);
+            // console.log("error: " + error);
 //            console.log("response: " + JSON.stringify(response));
-            console.log("body: " + body);
+            // console.log("body: " + body);
         
         var errorObject = new Error();
         
@@ -469,7 +384,7 @@ function makeRequest(options, callback) {
             errorObject.message = error.message;
             callback(errorObject, null);
         } else if (response && response.statusCode != 200) {
-            console.log(body);
+            // console.log(body);
             var responseBody = body;
             
             var errorObject = new Error();

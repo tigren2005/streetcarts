@@ -192,9 +192,9 @@ module.exports = {
         }        
     },
     
-    createBaasGroups: function (configOptions, callback) {
+    createBaasGroups: function (options, callback) {
 
-        var baasConfig = configOptions.config.apiBaaS;
+        var baasConfig = options.config.apiBaaS;
         
         var clientId = baasConfig.clientCredentials.clientId;
         var clientSecret = baasConfig.clientCredentials.clientSecret;
