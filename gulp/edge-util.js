@@ -15,7 +15,7 @@ module.exports = {
 	installNodeModules: function () {
 		
 		var opts = baseopts();
-		var callback = q.defer();
+		var defer = q.defer();
 		
         var host = opts.host;
         var org = opts.organization;
@@ -38,13 +38,13 @@ module.exports = {
             if (error) {
                 console.log("Could not install node modules: " + 
                     error.message);
-				callback.reject(error)
+				defer.reject(error)
             } else {
                 console.log("Installed node modules.");
-				callback.resolve(response)
+				defer.resolve(response)
             }
         });
-	    return callback.promise;
+	    return defer.promise;
 	},
 	
 	createVaults: function (vaults) {
@@ -160,7 +160,7 @@ function addVaultEntries(vault, callback) {
         
         console.log('\nAdding vault entry: ' +
 			entryName + ' : ' + entryValue);       
-		console.log(JSON.stringify(requestOptions));
+		// console.log(JSON.stringify(requestOptions));
 		
         makeRequest(requestOptions, function (error,
             response) {
@@ -170,7 +170,6 @@ function addVaultEntries(vault, callback) {
 		            callback(error, null);
             } else {
                 console.log("Added vault entry.");
-                console.log("\n" + JSON.stringify(response));
 	            callback(null, response);
             }
         });
@@ -187,7 +186,6 @@ function addVaultEntries(vault, callback) {
 
 
 function baseopts () {
-    // console.log('gutil-baas2: ' + JSON.stringify(gutil.env));
     var opts = {
         host: gutil.env.host,
         organization: gutil.env.org,

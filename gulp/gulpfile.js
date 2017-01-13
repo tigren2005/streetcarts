@@ -346,7 +346,7 @@ gulp.task('clean',function() {
             return edge.run(apiProducts, edge.deleteProducts)
         },
         function(err){
-            console.log('Developer delete failed: ' + err);
+            console.log('App delete failed: ' + err);
             return edge.run(apiProducts, edge.deleteProducts)
         }
     ).then(
