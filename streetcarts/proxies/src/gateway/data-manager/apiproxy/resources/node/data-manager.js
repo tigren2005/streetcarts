@@ -626,7 +626,7 @@ module.exports = {
 
         var tokenParam = "?access_token=" + args.baasToken;
         endpointPath = "/menus/" + args.menuUUID + 
-            "/includes/items/" + args.itemUUID + tokenParam;
+            "/includes/" + args.itemUUID + tokenParam;
         
         var uri = host + appPath + endpointPath;
         
@@ -1662,30 +1662,7 @@ function secureCartOwnerUserGroup (cartUUID, groupPath, callback) {
                 if (error) {
                     callback(error, null);
                 } else {
-                
-                    // Create the menu manager role that will include
-                    // permissions granting access to create, update, and 
-                    // delete menu items and menus for this foodcart.
-                    createMenuManagerRole(cartUUID, 
-                        function(error, menuManagerResponse) {
-                        if (error) {
-                            callback(error, null);
-                        } else {
-                        
-                            // Assign the new menu manager role to the 
-                            // foodcart's "owners" group.
-                            managerRoleName = menuManagerResponse.name;
-                            var menuManagerRoleName = menuManagerResponse.name;
-                            assignRoleToGroup(menuManagerRoleName, groupPath, 
-                                function(error, response) {
-                                if (error) {
-                                    callback(error, null);
-                                } else {
-                                    callback(null, response);                                        
-                                }
-                            });
-                        }                
-                    });                                            
+					callback(null, response);
                 }
             });
         }                
