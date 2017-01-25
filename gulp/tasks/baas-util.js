@@ -142,12 +142,12 @@ module.exports = {
         var appName = opts.usergrid_app;
 		       
         if (roles && roles.length > 0)
-        {			
+        {
             async.each(roles, function (role, callback) {
-			
+
             var roleTitle = role.title;
             var roleName = role.name;
-			
+
             var roleBody = {
                 "name" : roleName,
                 "title" : roleTitle
@@ -157,7 +157,7 @@ module.exports = {
             uri = baasHost + '/' + orgName + '/' + 
                 appName + '/roles?client_id=' + clientId +
                 '&client_secret=' + clientSecret;
-            
+
             var options = {
                 uri: uri,
                 body: JSON.stringify(roleBody),
@@ -168,11 +168,10 @@ module.exports = {
             };
             console.log('\nCreating role: ' + roleName);
             return makeRequest(options, function (error, response) {
-                if (error)
-                {
-	                console.log('\nCould not create role: ' + 
-	                    error.message);
-					defer.reject(error)
+                if (error) {
+                    console.log('\nCould not create role: ' + 
+                        error.message);
+                    defer.reject(error)
                     // callback(error, null);
                 } else {
                     var body = JSON.parse(response.body);
@@ -237,14 +236,14 @@ module.exports = {
             if (error) {
                 console.log("Could not create roles: " + 
                     error.message);
-				defer.reject(error)
+                defer.reject(error)
             } else {
                 console.log("Created roles.");
-				defer.resolve();
+                defer.resolve();
             }
         });
-	}
-		return defer.promise;			
+        }
+        return defer.promise;			
     },
 
     deleteRoles: function (roles) {
@@ -279,20 +278,19 @@ module.exports = {
                 });                
             },
             function (error) {
-	            if (error) {
-	                console.log("Could not delete groups: " + 
+                if (error) {
+                    console.log("Could not delete groups: " + 
 	                    error.message);
-					defer.reject(error)
+                    defer.reject(error)
 	            } else {
 	                console.log("Deleted groups.");
-					defer.resolve()
+                    defer.resolve()
 	            }
             });
         }
 		return defer.promise;		
 	},
 
-    
     assignRolesToGroups: function (groups) {
 
 		var opts = baseopts();
@@ -358,7 +356,8 @@ module.exports = {
             }
         });
 		return defer.promise;			
-    }
+    },
+	
 }
 
 function deleteGroup(groupName, uri, callback) {
@@ -413,19 +412,21 @@ function baseopts () {
     // console.log('gutil-baas2: ' + JSON.stringify(gutil.env));
     var opts = {
         host: gutil.env.host,
-        organization: gutil.env.org,
         token: gutil.env.token,
+        organization: gutil.env.org,
         environments: gutil.env.env,    
         environment: gutil.env.env,
         debug: gutil.env.debug,
+        app_domain: gutil.env.domain,
+        app_consumer_key: gutil.env.consumer_key,
+        app_consumer_secret: gutil.env.consumer_secret,
         usergrid_org: gutil.env.usergrid_org,   
         usergrid_app: gutil.env.usergrid_app,
         usergrid_client_id: gutil.env.usergrid_client_id,
         usergrid_secret: gutil.env.usergrid_secret,
-        usergrid_host: gutil.env.baas_api
-    }
-    // console.log('opts: ' + JSON.stringify(opts));
-    return opts
+        usergrid_host: gutil.env.usergrid_host
+    };
+    return opts;
 }
 
 function makeRequest(options, callback) {
@@ -437,7 +438,6 @@ function makeRequest(options, callback) {
         
         if (error) {
             console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            console.log('Status code: ' + response.statusCode);
             
             errorObject.message = error.message;
             errorObject.statusCode = error.statusCode;
