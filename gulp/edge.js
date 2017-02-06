@@ -103,8 +103,19 @@ function deleteApis(it,cb){
             console.log('deleted ' + opts.api)
             cb(null, 'done')
         },function(err){
+            console.log('delete failed ' + err.message)
             console.log('delete failed ' + opts.api)
-            cb(err)
+			// Ignore the "does not exist" message because
+			// we want to keep deleting even if one of the 
+			// proxies has been deleted by the user.
+			if (err.message.includes('does not exist'))
+			{
+				console.log(err)
+				cb(null)
+			} else {
+				console.log(err)
+	            cb(err)				
+			}
         })            
 }
 
@@ -163,7 +174,7 @@ function run(arr, func){
         func(c,cb)
     },function(err,results){
         if(err){
-            console.log(err)
+            console.log('run error' + err)
             defer.reject(err)
         }
         q.all(results)
@@ -177,7 +188,6 @@ function run(arr, func){
     })
     return defer.promise
 }
-
 
 function baseopts () {
     var opts = {
