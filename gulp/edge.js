@@ -90,7 +90,6 @@ function deleteApis(it,cb){
         var opts = baseopts()
         opts.directory = it.dir
         opts.api = it.proxy
-        console.log('Undeploying ' + opts.api)
         sdk.undeploy(opts)
         .then(function(){
             console.log('Undeployed ' + opts.api)

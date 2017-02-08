@@ -50,7 +50,6 @@ function createUserAccounts(users) {
                 },
                 method: "POST"
             };
-            
             return makeRequest(options, function (error, response) {
                 if (error) {
                     if ((error.statusCode === 400) && error.message.indexOf('exists')) {
@@ -69,6 +68,7 @@ function createUserAccounts(users) {
             if (error) {
                 console.log("Could not create user accounts: " + 
                     error.message);
+                    console.log(JSON.stringify(error));
 				defer.reject(error);
             } else {
                 console.log("Created user accounts.");
@@ -128,11 +128,11 @@ function deleteUserAccounts(users) {
         },
         function (error) {
             if (error) {
-                console.log("Could not create user accounts: " + 
+                console.log("Could not delete user accounts: " + 
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Created user accounts.");
+                console.log("Deleted user accounts.");
 				defer.resolve();
             }
         });
@@ -179,7 +179,7 @@ function createFoodcarts(foodcartsData, usersData) {
                     callback(error, null);
                 } else {
                     var access_token = JSON.parse(response.body).access_token;
-                    console.log(username + ' authenticated with token: ' + access_token);
+                    console.log('\n' + username + ' authenticated with token: ' + access_token);
                 
                     var foodcartEntity = JSON.parse(foodcart);
                     var itemsData = foodcartEntity.items;
@@ -250,11 +250,11 @@ function createFoodcarts(foodcartsData, usersData) {
         },
         function (error) {
             if (error) {
-                console.log("Could not import foodcart data: " + 
+                console.log("\nCould not import foodcart data: " + 
                     error.message);
 					defer.reject(error);
             } else {
-                console.log("Imported foodcart data.");
+                console.log("\nImported foodcart data.");
 				defer.resolve();
             }
         });
@@ -263,7 +263,7 @@ function createFoodcarts(foodcartsData, usersData) {
 }
 
 function deleteFoodcarts(foodcartsData, usersData) {
-    console.log('\n\Deleting foodcarts.');
+    console.log('\nDeleting foodcarts.');
 
 	var opts = baseopts();
 	var defer = q.defer();
@@ -301,7 +301,7 @@ function deleteFoodcarts(foodcartsData, usersData) {
                     callback(error, null);
                 } else {
                     var access_token = JSON.parse(response.body).access_token;
-                    console.log(username + ' authenticated with token: ' + access_token);
+                    console.log('\n' + username + ' authenticated with token: ' + access_token);
                 
                     var foodcartEntity = JSON.parse(foodcart);
                     var itemsData = foodcartEntity.items;
@@ -410,7 +410,7 @@ function createMenusForFoodcart(foodcartUUID, menusData, options, callback) {
     if (menusData.length > 0) {
     
         async.each(menusData, function (menuData, callback) {
-            console.log('\nCreating menu: ' + menuName);
+            console.log('\nCreating menu: ' + menuData.menuName);
             
             options.uri = uri;
             options.body = JSON.stringify(menuData);
@@ -438,7 +438,7 @@ function createMenusForFoodcart(foodcartUUID, menusData, options, callback) {
 }
 
 function addItemsToMenu(menuUUID, itemsUUIDs, options, callback) {
-	console.log('Adding items to menu.');
+	console.log('\nAdding items to menu with ID: ' + menuUUID);
 	
     endpointPath = '/menus/' + menuUUID + '/items/';
     if (itemsUUIDs.length > 0) {

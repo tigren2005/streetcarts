@@ -41,7 +41,7 @@ function createGroups(groups) {
                 },
                 method: "POST"
             };
-            console.log('\nCreating group: ' + path);
+            console.log('\nCreating API BaaS group: ' + path);
             return makeRequest(options, function (error, response) {
                 if (error && error.statusCode != '201')
                 {
@@ -64,7 +64,7 @@ function createGroups(groups) {
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Created groups.");
+                console.log("Created API BaaS groups.");
 				defer.resolve();
             }
         });
@@ -107,7 +107,7 @@ function deleteGroups(groups) {
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Deleted groups.");
+                console.log("Deleted API BaaS groups.");
 				defer.resolve();
             }
         });
@@ -151,7 +151,7 @@ function createRoles(roles) {
             },
             method: "POST"
         };
-        console.log('\nCreating role: ' + roleName);
+        console.log('\nCreating API BaaS role: ' + roleName);
         return makeRequest(options, function (error, response) {
             if (error) {
                 console.log('\nCould not create role: ' + 
@@ -221,7 +221,7 @@ function createRoles(roles) {
                 error.message);
 			defer.reject(error);
         } else {
-            console.log("Created roles.");
+            console.log("Created API BaaS roles.");
             defer.resolve();
         }
     });
@@ -264,7 +264,7 @@ function deleteRoles(roles) {
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Deleted groups.");
+                console.log("Deleted API BaaS groups.");
                 defer.resolve();
             }
         });
@@ -327,11 +327,11 @@ function assignRolesToGroups(groups) {
     },
     function (error) {
         if (error) {
-            console.log("Could not assign roles: " + 
+            console.log("Could not assign API BaaS roles: " + 
                 error.message);
 			defer.reject(error)
         } else {
-            console.log("Assigned roles to groups.");
+            console.log("Assigned API BaaS roles to groups.");
 			defer.resolve();
         }
     });
@@ -347,7 +347,7 @@ function deleteGroup(groupName, uri, callback) {
         },
         method: "DELETE"
     };
-    console.log('\nDeleting group: ' + groupName)
+    console.log('\nDeleting API BaaS group: ' + groupName)
     return makeRequest(options, function (error, response) {
         if (error)
         {
@@ -371,7 +371,7 @@ function deleteRole(roleName, uri, callback) {
         },
         method: "DELETE"
     };
-    console.log('\nDeleting role: ' + roleName)
+    console.log('\nDeleting API BaaS role: ' + roleName)
     return makeRequest(options, function (error, response) {
         if (error)
         {
@@ -414,14 +414,10 @@ function makeRequest(options, callback) {
         var errorObject = new Error();
         
         if (error) {
-            console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            
             errorObject.message = error.message;
             errorObject.statusCode = error.statusCode;
             callback(errorObject, null);
         } else if (response.statusCode !== 200 && response.statusCode !== 201) {
-            console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            
             var bodyObj = JSON.parse(response.body);
             if (bodyObj.fault) {
                 var fault = bodyObj.fault;

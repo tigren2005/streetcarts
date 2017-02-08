@@ -95,7 +95,7 @@ gulp.task('clean-edge', ['init-config'], function(callback){
             return edge.run(developers, edge.deleteDevelopers);
         },
         function(error){ 
-            console.log('App delete failed: ' + error);
+            console.log('\nApp delete failed: ' + error);
             return edge.run(developers, edge.deleteDevelopers);
         })
 	.then(
@@ -104,7 +104,7 @@ gulp.task('clean-edge', ['init-config'], function(callback){
             return edge.run(apiProducts, edge.deleteProducts);
         },
         function(error){
-            console.log('App delete failed: ' + error);
+            console.log('\nApp delete failed: ' + error);
             return edge.run(apiProducts, edge.deleteProducts);
         })
 	.then(
@@ -113,25 +113,25 @@ gulp.task('clean-edge', ['init-config'], function(callback){
             return edge.run(apilist, edge.deleteApis);
         },
         function(error){ 
-            console.log('Product delete failed: ' + error);
+            console.log('\nProduct delete failed: ' + error);
             return edge.run(apilist, edge.deleteApis);
         })
 	.then(
         function () {
-            console.log('Deleting KVMs');
+            console.log('\nDeleting KVMs');
             return edge.run(kvms, edge.deleteKVMs);
         },
         function (error) {
-            console.log('API delete failed: ' + error);
+            console.log('\nAPI delete failed: ' + error);
             return edge.run(kvms, edge.deleteKVMs);
         })
 	.then(
         function () {
-            console.log('All done');
+            console.log('\nAll done cleaning Edge.');
 			// callback();
         },
         function (error) {
-            console.log('KVM delete failed: ' + error);
+            console.log('\nKVM delete failed: ' + error);
 			// callback(error);
         }
     )
@@ -149,7 +149,7 @@ gulp.task('clean-build', function () {
 gulp.task('build',function(callback){
     var baas_org = gutil.env.usergrid_org;
     var baas_app = gutil.env.usergrid_app;
-    var baas_api = gutil.env.baas_api;
+    var baas_api = gutil.env.usergrid_host;
     
     var replace_opts = {
         BAASAPIREPLACE: baas_api,
@@ -170,7 +170,7 @@ gulp.task('build',function(callback){
 	        .pipe(gulp.dest('./build/gateway/data-manager/apiproxy/resources/node/'))
     	},
 		function (error) {
-			console.log('Build error: ' + error);
+			console.log('\nBuild error: ' + error);
 			callback(error);
 		}
 	);
@@ -189,55 +189,55 @@ gulp.task('deploy', function(callback){
 // Set up the Edge pieces. Import proxies, products, developer, 
 // apps, KVMS, then deploy.
 gulp.task('deploy-app', function(callback) {    
-    console.log('Creating API proxies.');
+    console.log('\nCreating API proxies.');
     return edge.run(apilist, edge.deployApis)
     .then(
 		function () {
-            console.log('Creating developers.');
+            console.log('\nCreating developers.');
 	        return edge.run(developers, edge.createDevelopers);
 	    },
 	    function (error) {
-	        console.log('Unable to deploy APIs. ' +
+	        console.log('\nUnable to deploy APIs. ' +
 	            'Moving on to create developers.\n' +
 	            error);
 			return edge.run(developers, edge.createDevelopers);
 	    })
 	.then(
 		function () {
-            console.log('Creating API products.');
+            console.log('\nCreating API products.');
 	        return edge.run(apiProducts, edge.createProducts);
 	    },
 	    function (error) {
-	    	console.log('Unable to create developers. ' +
+	    	console.log('\nUnable to create developers. ' +
 	        	'Moving on to create create products.\n' +
 	        	error);
 			return edge.run(apiProducts, edge.createProducts);
 	    })
 	.then(
 		function () {
-            console.log('Creating developer apps.');
+            console.log('\nCreating developer apps.');
 	        return edge.run(apps, edge.createApps);
 	    },
 	    function (error) {
-			console.log('Unable to create products. ' +
+			console.log('\nUnable to create products. ' +
 	    		'Moving on to create apps.\n' +
 	    		error);
 			return edge.run(apps, edge.createApps);
 	    })
 	.then(
 		function () {
-            console.log('Creating KVMs.');
+            console.log('\nCreating KVMs.');
             return edge.run(kvms, edge.createKVMs);
         },
         function (error) {
-            console.log('Unable to create apps. ' +
+            console.log('\nUnable to create apps. ' +
                 'Moving on to create key-value maps.\n' +
                 error);
 			return edge.run(kvms, edge.createKVMs);
         }
     ).then(
         function () {
-            console.log('Creating KVM entries.');
+            console.log('\nCreating KVM entries.');
             
             var host = gutil.env.host;
             var org = gutil.env.org;
@@ -262,7 +262,6 @@ gulp.task('deploy-app', function(callback) {
                     var consumerKey =
                         JSON.parse(response).credentials[0].consumerKey;
                         
-                    // async.each(groups, function (group, callback) {
                     async.each(kvmEntries, function(kvmEntry, callback){
                         if (kvmEntry.name === 'X-DATA-MANAGER-KEY'){
                             kvmEntry.value = consumerKey;
@@ -275,13 +274,12 @@ gulp.task('deploy-app', function(callback) {
                     },
                     function (error) {
                         if (error) {
-                            console.log("Could not create KVM entries: " + 
+                            console.log("\nCould not create KVM entries: " + 
                                 error.message);
                         } else {
-                            console.log("Created KVM entries.");
+                            console.log("\nCreated KVM entries.");
                         }
                     });
-                    // kvmEntries[0].value = consumerKey;
                     return edge.run(kvmEntries, edge.createKVMEntries)
                 }
             });
@@ -296,18 +294,18 @@ gulp.task('deploy-app', function(callback) {
             return edgeConfig.installNodeModules();
         },
         function (error) {
-            console.log('Unable to create apps. ' +
+            console.log('\nUnable to create apps. ' +
                 'Moving on to create key-value maps.\n' +
                 error);
 			return edgeConfig.installNodeModules();
         })
 	.then(
         function () {
-            console.log('All done');
-            console.log('Installed Node modules.');
+            console.log('\nInstalled Node modules.');
+            console.log('\nAll done deploying to Edge.');
         },
         function (error) {
-            console.log('Unable to install Node modules.\n: ' +
+            console.log('\nUnable to install Node modules.\n: ' +
                 error);
         }
     )	
@@ -318,21 +316,20 @@ gulp.task('clean-baas', ['init-config'], function(callback) {
     return baasConfig.deleteGroups(groups)
 	.then(
         function() {
-            console.log('Deleted groups');
+            console.log('\nDeleted groups');
             return baasConfig.deleteRoles(roles);
         },
         function(error) { 
-            console.log('Failed to delete groups: ' + error);
+            console.log('\nFailed to delete groups: ' + error);
             return baasConfig.deleteRoles(roles);
         }
 	).then(
         function() {
-            console.log('Deleted roles');
-            console.log('All done.');
+            console.log('\nDeleted roles');
+            console.log('\nAll done cleaning API BaaS.');
         },
         function(error) { 
-            console.log('Failed to delete roles: ' + error);
-            console.log('All done.');
+            console.log('\nFailed to delete roles: ' + error);
         }
     )
 });
@@ -342,29 +339,29 @@ gulp.task('configure-baas', ['init-config'], function(callback) {
     return baasConfig.createGroups(groups)
 	.then(
         function() {
-            console.log('Created groups');
+            console.log('\nCreated groups');
             return baasConfig.createRoles(roles);
         },
         function(error) {
-            console.log('Failed to create groups: ' + error);
+            console.log('\nFailed to create groups: ' + error);
             return baasConfig.createRoles(roles);
         })
 	.then(
         function() {
-            console.log('Created roles');
+            console.log('\nCreated roles');
             return baasConfig.assignRolesToGroups(groups);
         },
         function(error) {
-            console.log('Failed to create roles: ' + error);
+            console.log('\nFailed to create roles: ' + error);
             return baasConfig.assignRolesToGroups(groups);
         })
 	.then(
         function () {
-            console.log('Assigned roles to groups.');
-            console.log('All done.');
+            console.log('\nAssigned roles to groups.');
+            console.log('\nAll done configuring API BaaS.');
         },
         function (error) {
-            console.log('Failed to assign roles to groups.');
+            console.log('\nFailed to assign roles to groups.');
             console.log(error);
         }
     )
@@ -376,15 +373,15 @@ gulp.task('seed-streetcarts', ['init-seed'], function(callback){
 	return streetcartsSeed.createUserAccounts(users)
 	.then( 
         function() {
-            console.log('Created user accounts');
+            console.log('\nCreated user accounts');
             return streetcartsSeed.createFoodcarts(foodcarts, users);
         },
         function(error) { 
-            console.log('Failed to create user accounts: ' + error);
+            console.log('\nFailed to create user accounts: ' + error);
         })
     .then(
         function () {
-            console.log('All done');
+            console.log('\nAll done');
         },
         function (error) {
             console.log('\nError: ');

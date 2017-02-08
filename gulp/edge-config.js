@@ -25,7 +25,6 @@ function installNodeModules() {
         method: "POST",
         form: { command:'install' }
     };
-    console.log('\nInstalling node modules: ' + JSON.stringify(options));
 
     makeRequest(options, function (error, response) {
         if (error) {
