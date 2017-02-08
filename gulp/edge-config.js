@@ -25,6 +25,7 @@ function installNodeModules() {
         method: "POST",
         form: { command:'install' }
     };
+    console.log('\nInstalling node modules: ' + JSON.stringify(options));
 
     makeRequest(options, function (error, response) {
         if (error) {
@@ -33,189 +34,6 @@ function installNodeModules() {
 			defer.reject(error);
         } else {
             console.log("Installed node modules.");
-			defer.resolve(response);
-        }
-    });
-    return defer.promise;
-}
-
-function createVaults(vaults) {
-	
-	var options = baseopts();
-	var defer = q.defer();
-	
-    var host = options.host;
-    var org = options.organization;
-    var env = options.environment;
-	
-    var uri = host + 'v1/' +
-        'o/' + org + 
-        '/e/' + env +
-        '/vaults';
-        
-    async.each(vaults, function (vault, callback) {
-        
-        var vaultBody = {
-            "name": vault.name
-        };
-	
-        options = {
-            uri: uri,
-            body: JSON.stringify(vaultBody),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            auth: {
-                'bearer': options.token
-            },
-            method: "POST"
-        };
-    
-        // console.log('\nCreating vault: ' + JSON.stringify(options));
-		
-        makeRequest(options, function (error, response) {
-            if (error) {
-                console.log("Could not create vault: " + 
-                    error.message);
-				defer.reject(error);
-            } else {
-                console.log("Created vault.");
-									
-				addVaultEntries(vault, function (error, response){
-					if (error) {
-		                console.log("Could not add vault entries: " + 
-		                    error.message);
-							defer.reject(error);
-					} else {
-		                console.log("Added vault entries.");
-		                console.log('\n' + JSON.stringify(response));
-						defer.resolve(response);
-					}
-				})					
-				defer.resolve(response);
-            }
-        });
-    },
-    function (error) {
-        if (error) {
-			defer.reject(error);
-        } else {
-			defer.resolve(response);
-        }
-    });
-    return defer.promise;
-}
-
-function addVaultEntries(vault, callback) {
-	
-	console.log('\nAdding vault entries: ' + JSON.stringify(vault));
-
-	var options = baseopts();
-	var defer = q.defer();
-	
-    var host = options.host;
-    var org = options.organization;
-    var env = options.environment;
-	
-	var vaultName = vault.name;
-	var entries = vault.entries;
-	
-    async.each(entries, function (entry, callback) {
-		console.log('\nEntry: ' + JSON.stringify(entry));
-        var entryName = entry.name;
-        var entryValue = entry.value;
-        
-	    var uri = host + 'v1/' +
-	        'o/' + org + 
-	        '/e/' + env +
-	        '/vaults/' + vaultName +
-			'/entries';
-    
-        var body = {
-            "name": entryName,
-            "value": entryValue
-        };
-        var requestOptions = {
-            uri: uri,
-            body: JSON.stringify(body),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            auth: {
-                'bearer': options.token
-            },
-            method: "POST"
-        };
-		console.log('\nAdding vault entry: ' + JSON.stringify(requestOptions));
-		
-	    // sleep.sleep(3);
-        
-        makeRequest(requestOptions, function (error,
-            response) {
-            if (error) {
-                console.log("Could not add vault entry: " + 
-                    error.message);
-	            callback(error, null);
-            } else {
-                console.log("Added vault entry.");
-				console.log('\n' + JSON.stringify(response));
-	            callback(null, response);
-            }
-        });
-    },
-    function (error) {
-        if (error) {
-            callback(error, null);
-        } else {
-            callback(null, 'Added vault entries.');
-        }
-    });
-}
-
-function deleteVaults(vaults) {
-	
-	var options = baseopts();
-	var defer = q.defer();
-	
-    var host = options.host;
-    var org = options.organization;
-    var env = options.environment;
-	
-    var uri = host + 'v1/' +
-        'o/' + org + 
-        '/e/' + env +
-        '/vaults';
-        
-    async.each(vaults, function (vault, callback) {
-        
-        var vaultName = vault.name;
-		
-		uri = uri + '/' + vaultName;
-	
-        options = {
-            uri: uri,
-            auth: {
-                'bearer': options.token
-            },
-            method: "DELETE"
-        };
-    
-        console.log('\nDeleting vault: ' + JSON.stringify(options));
-		
-        makeRequest(options, function (error, response) {
-            if (error) {
-                console.log("Could not delete vault: " + 
-                    error.message);
-				defer.reject(error);
-            } else {
-                console.log("Deleted vault.");
-			}
-        });
-    },
-    function (error) {
-        if (error) {
-			defer.reject(error);
-        } else {
 			defer.resolve(response);
         }
     });
@@ -322,8 +140,6 @@ function makeRequest(options, callback) {
 
 module.exports = {
     installNodeModules: installNodeModules,
-    createVaults: createVaults,
-	deleteVaults: deleteVaults,
 	getAppKeyAndSecret: getAppKeyAndSecret
 }
 

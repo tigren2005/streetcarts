@@ -154,36 +154,38 @@
 		}
 	],
 
-	"kvms" : [{
-	    "name": "DATA-MANAGER-API-KEY"
-	}],
+	"kvms" : [
+        {
+    	    "name": "DATA-MANAGER-API-KEY"
+    	},
+        {
+            "name" : "streetcarts",
+            "encrypted" : "true"
+        }
+    ],
 
-	"kvmEntries" : [{
-	    "name": "X-DATA-MANAGER-KEY",
-	    "value": "",
-	    "mapName": "DATA-MANAGER-API-KEY"
-	}],
-
-	"vaults" : [
-	    {
-	        "name": "streetcarts",
-	        "scope": "environment",
-	        "entries" :[
-	            {
-	                "name": "datastore-client-id",
-	                "value": "gutil.env.usergrid_client_id"
-	            },
-	            {
-	                "name": "datastore-client-secret",
-	                "value": "gutil.env.usergrid_secret"
-	            },
-	            {
-	                "name": "datastore-client-token",
-	                "value": ""
-	            }
-	        ]
-	    }
-	],
+	"kvmEntries" : [
+        {
+    	    "name": "X-DATA-MANAGER-KEY",
+    	    "value": "",
+    	    "mapName": "DATA-MANAGER-API-KEY"
+    	},
+        {
+            "name" : "datastore-client-id",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        },
+        {
+            "name" : "datastore-client-secret",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        },
+        {
+            "name" : "datastore-client-token",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        }
+    ],
 
 	"groups" : [
 	    {

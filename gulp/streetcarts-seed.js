@@ -17,9 +17,9 @@ var consumerKey = '';
 var consumerSecret = '';
 
 function createUserAccounts(users) {
+    console.log('\nCreating user accounts.');
 
 	var opts = baseopts();
-    console.log('\nopts: ' + JSON.stringify(opts))
 	var defer = q.defer();
 	
     var domain = opts.app_domain;
@@ -40,7 +40,7 @@ function createUserAccounts(users) {
     if (users.length > 0) {
     
         async.each(users, function (user, callback) {	            
-            console.log('\nCreating user ' + user.username);
+            console.log('\nCreating user: ' + user.username);
             var options = {
                 uri: uri,
                 body: JSON.stringify(user),
@@ -50,7 +50,7 @@ function createUserAccounts(users) {
                 },
                 method: "POST"
             };
-            console.log('\nCreating user accounts: ' + JSON.stringify(options));
+            
             return makeRequest(options, function (error, response) {
                 if (error) {
                     if ((error.statusCode === 400) && error.message.indexOf('exists')) {
@@ -102,7 +102,7 @@ function deleteUserAccounts(users) {
     if (users.length > 0) {
     
         async.each(users, function (user, callback) {	            
-            console.log('\nDeleting user ' + user.username);
+            console.log('\nDeleting user: ' + user.username);
             var options = {
                 uri: uri,
                 body: JSON.stringify(user),
@@ -263,7 +263,7 @@ function createFoodcarts(foodcartsData, usersData) {
 }
 
 function deleteFoodcarts(foodcartsData, usersData) {
-    console.log('\n\Creating foodcarts.');
+    console.log('\n\Deleting foodcarts.');
 
 	var opts = baseopts();
 	var defer = q.defer();
@@ -322,7 +322,7 @@ function deleteFoodcarts(foodcartsData, usersData) {
 
                     makeRequest(options, function (error, response) {
                         if (error) {
-                            console.log('\nError creating foodcart "' + 
+                            console.log('\nError deleting foodcart "' + 
 								foodcartEntity.cartName + '"\n ' + 
                                 JSON.stringify(error));
                             callback(error, null);
@@ -334,7 +334,7 @@ function deleteFoodcarts(foodcartsData, usersData) {
                                foodcart = response.body;
                             }                        
                             var foodcartUUID = foodcart.uuid;
-							console.log('Deleted: ' + foodcartUUID);
+							console.log('Deleted foodcart with ID ' + foodcartUUID);
                         }
                     });
                 }
@@ -365,6 +365,8 @@ function createItemsForFoodcart(foodcartUUID, itemsData, options, callback) {
     if (itemsData.length > 0) {
     
         async.each(itemsData, function (itemData, callback) {
+            console.log('\nCreating menu item: ' + itemData.itemName);
+            
             var item = JSON.stringify(itemData);
         
             options.uri = uri;
@@ -408,6 +410,8 @@ function createMenusForFoodcart(foodcartUUID, menusData, options, callback) {
     if (menusData.length > 0) {
     
         async.each(menusData, function (menuData, callback) {
+            console.log('\nCreating menu: ' + menuName);
+            
             options.uri = uri;
             options.body = JSON.stringify(menuData);
         

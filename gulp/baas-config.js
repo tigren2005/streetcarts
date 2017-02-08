@@ -24,10 +24,6 @@ function createGroups(groups) {
             var title = group.title;
             var path = group.path;
             
-            // var uri = baasHost + '/' + orgName + '/' +
-            //     appName + '/groups/' + path + '?client_id=' +
-            //     clientId + '&client_secret=' + clientSecret;
-            
             var groupBody = {
                 "path" : path,
                 "title" : title
@@ -206,8 +202,7 @@ function createRoles(roles) {
                                 callback(null, response);
                             }
                         });
-                    }, 
-                    
+                    },
                     function (error) {
                         if (error) { 
                             callback(error, null);                                    
@@ -332,11 +327,11 @@ function assignRolesToGroups(groups) {
     },
     function (error) {
         if (error) {
-            console.log("Could not create roles: " + 
+            console.log("Could not assign roles: " + 
                 error.message);
 			defer.reject(error)
         } else {
-            console.log("Created roles.");
+            console.log("Assigned roles to groups.");
 			defer.resolve();
         }
     });

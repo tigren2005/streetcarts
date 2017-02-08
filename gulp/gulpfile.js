@@ -26,7 +26,6 @@ var developers = null;
 var apps = null;
 var kvms = null;
 var kvmEntries = null;
-var vaults = null;
 var groups = null;
 var roles = null;
 
@@ -51,7 +50,6 @@ gulp.task('init-config', function(callback){
 			apps = streetcartsConfig.apps;
 			kvms = streetcartsConfig.kvms;
 			kvmEntries = streetcartsConfig.kvmEntries;
-			vaults = streetcartsConfig.vaults;
 			groups = streetcartsConfig.groups;
 			roles = streetcartsConfig.roles;
 			callback();
@@ -80,7 +78,6 @@ gulp.task('init-seed', ['init-config'], function(callback){
 				if (error){
 					callback(error);
 				} else {
-					console.log('\nresponse: ' + JSON.stringify(response));
 					gutil.env.consumer_key = response.consumerKey;
 					gutil.env.consumer_secret = response.consumerSecret;
 					callback();
@@ -91,7 +88,7 @@ gulp.task('init-seed', ['init-config'], function(callback){
 });
 
 // Remove the Edge pieces from Edge. This includes the proxies, products, 
-// developer, apps, KVMs, and vault that this script creates.
+// developer, apps, KVMs and that this script creates.
 gulp.task('clean-edge', ['init-config'], function(callback){
     return edge.run(apps, edge.deleteApps).then(
         function(){ 
@@ -130,27 +127,18 @@ gulp.task('clean-edge', ['init-config'], function(callback){
         })
 	.then(
         function () {
-            console.log('Deleting vaults');
-            return edgeConfig.deleteVaults(vaults);
-        },
-        function (error) {
-            console.log('KVM delete failed: ' + error);
-			return edgeConfig.deleteVaults(vaults);
-        })
-	.then(
-        function () {
             console.log('All done');
 			// callback();
         },
         function (error) {
-            console.log('Vaults delete failed: ' + error);
+            console.log('KVM delete failed: ' + error);
 			// callback(error);
         }
-    )	
+    )
 });
 
 // Clean the build directory created by this script.
-gulp.task('build-clean', function () {
+gulp.task('clean-build', function () {
 
     // Delete Temp Files & Folders
     return del(['./build/**']);
@@ -177,7 +165,6 @@ gulp.task('build',function(callback){
 	})
 	.then(
 		function() {
-			console.log('replace');
 	        gulp.src('./build/gateway/data-manager/apiproxy/resources/node/data-manager.js')
 	        .pipe(build(replace_opts))
 	        .pipe(gulp.dest('./build/gateway/data-manager/apiproxy/resources/node/'))
@@ -192,15 +179,21 @@ gulp.task('build',function(callback){
 // Run the other tasks that clean and deploy.
 gulp.task('deploy', function(callback){
 	// Gulp runs dependencies in parallel. Make sure these are run sequentially.
-	runSequence('build-clean', 'build', 'init-config', 'deploy-app', callback);
+    runSequence('clean-build', 'build', 'init-config', 'deploy-app',
+            'configure-baas', callback);
+    // runSequence('clean-build', 'build', 'init-config', 'deploy-app',
+    //         'configure-baas', 'seed-streetcarts', callback);
+    // runSequence('clean-build', 'build', 'init-config', 'deploy-app', callback);
 });
 
 // Set up the Edge pieces. Import proxies, products, developer, 
-// apps, KVMS, and vault, then deploy.
-gulp.task('deploy-app', function() {
+// apps, KVMS, then deploy.
+gulp.task('deploy-app', function(callback) {    
+    console.log('Creating API proxies.');
     return edge.run(apilist, edge.deployApis)
     .then(
 		function () {
+            console.log('Creating developers.');
 	        return edge.run(developers, edge.createDevelopers);
 	    },
 	    function (error) {
@@ -211,6 +204,7 @@ gulp.task('deploy-app', function() {
 	    })
 	.then(
 		function () {
+            console.log('Creating API products.');
 	        return edge.run(apiProducts, edge.createProducts);
 	    },
 	    function (error) {
@@ -221,6 +215,7 @@ gulp.task('deploy-app', function() {
 	    })
 	.then(
 		function () {
+            console.log('Creating developer apps.');
 	        return edge.run(apps, edge.createApps);
 	    },
 	    function (error) {
@@ -231,6 +226,7 @@ gulp.task('deploy-app', function() {
 	    })
 	.then(
 		function () {
+            console.log('Creating KVMs.');
             return edge.run(kvms, edge.createKVMs);
         },
         function (error) {
@@ -241,6 +237,8 @@ gulp.task('deploy-app', function() {
         }
     ).then(
         function () {
+            console.log('Creating KVM entries.');
+            
             var host = gutil.env.host;
             var org = gutil.env.org;
             var env = gutil.env.env;
@@ -253,16 +251,37 @@ gulp.task('deploy-app', function() {
                 },
                 method: "GET"
             };
+            
+            // console.log('\nGetting data manager app: ' + JSON.stringify(options));
 
             makeRequest(options, function (error, response) {
                 if (error) {
                     console.log("\nCould not get data manager app: " +
                         error);
                 } else {
-                    // console.log("\nGot data manager app");
                     var consumerKey =
                         JSON.parse(response).credentials[0].consumerKey;
-                    kvmEntries[0].value = consumerKey;
+                        
+                    // async.each(groups, function (group, callback) {
+                    async.each(kvmEntries, function(kvmEntry, callback){
+                        if (kvmEntry.name === 'X-DATA-MANAGER-KEY'){
+                            kvmEntry.value = consumerKey;
+                        } else if (kvmEntry.name === 'datastore-client-id'){
+                            kvmEntry.value = gutil.env.usergrid_client_id;
+                        } else if (kvmEntry.name === 'datastore-client-secret'){
+                            kvmEntry.value = gutil.env.usergrid_secret;
+                        }
+                        callback();
+                    },
+                    function (error) {
+                        if (error) {
+                            console.log("Could not create KVM entries: " + 
+                                error.message);
+                        } else {
+                            console.log("Created KVM entries.");
+                        }
+                    });
+                    // kvmEntries[0].value = consumerKey;
                     return edge.run(kvmEntries, edge.createKVMEntries)
                 }
             });
@@ -273,6 +292,7 @@ gulp.task('deploy-app', function() {
         })
 	.then(
         function () {
+            console.log('Installing Node modules.');
             return edgeConfig.installNodeModules();
         },
         function (error) {
@@ -282,31 +302,13 @@ gulp.task('deploy-app', function() {
 			return edgeConfig.installNodeModules();
         })
 	.then(
-	    function () {
-			completeVaultData(vaults, function(error, response){
-				if (error){
-		            console.log('Unable to install Node modules. ' +
-		                'Moving on to create create vaults.\n' +
-		                error);
-					return edgeConfig.createVaults(completeVaults);
-				} else {
-					vaults = completeVaults;
-				}
-			});
-	        return edgeConfig.createVaults(vaults);
-	    },
-	    function (error) {
-	        console.log('Unable to install Node modules. ' +
-	            'Moving on to create create vaults.\n' +
-	            error);
-			return edgeConfig.createVaults(vaults);
-	    })
-	.then(
         function () {
-            console.log('all done');
+            console.log('All done');
+            console.log('Installed Node modules.');
         },
         function (error) {
-            console.log(error);
+            console.log('Unable to install Node modules.\n: ' +
+                error);
         }
     )	
 });
@@ -395,39 +397,6 @@ gulp.task('seed-streetcarts', ['init-seed'], function(callback){
 gulp.task('default', function () {
     // place code for your default task here
 });
-
-// Add BaaS values from command line to Edge vault.
-function completeVaultData(vaults, callback){
-	
-    async.each(vaults, function (vault,
-        callback) {
-        if (vault.name === 'streetcarts') {
-		    async.each(vault.entries, function (entry, callback) {
-		        if (entry.name === 'datastore-client-id') {
-					entry.value = gutil.env.usergrid_client_id;
-				} 
-				if (entry.name === 'datastore-client-secret') {
-					entry.value = gutil.env.usergrid_secret;
-				}
-			},
-		    function (error) {
-		        if (error) {
-		            callback(error, null);
-		        } else {
-		            callback(null, 'Updated entry value.');
-		        }
-		    });
-		};
-    },
-    function (error) {
-        if (error) {
-            callback(error, null);
-        } else {
-            callback(null, vaults);
-        }
-    });
-	// callback(vaults);
-}
 
 // Make HTTP requests.
 function makeRequest(options, callback) {

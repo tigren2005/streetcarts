@@ -74,7 +74,7 @@ function createDevelopers (dev,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     for(k in dev) opts[k]=dev[k]
-    console.log(opts)
+    console.log('Creating developer: ' + opts);
     cb(null,sdk.createDeveloper(opts))
 }
 
@@ -90,21 +90,21 @@ function deleteApis(it,cb){
         var opts = baseopts()
         opts.directory = it.dir
         opts.api = it.proxy
-        console.log('undeploying ' + opts.api)
+        console.log('Undeploying ' + opts.api)
         sdk.undeploy(opts)
         .then(function(){
-            console.log('undeployed ' + opts.api)
+            console.log('Undeployed ' + opts.api)
             return sdk.delete(opts)
         },function(err){
             console.log(err)
             return sdk.delete(opts)
         })
         .then(function(){
-            console.log('deleted ' + opts.api)
+            console.log('Deleted ' + opts.api)
             cb(null, 'done')
         },function(err){
-            console.log('delete failed ' + err.message)
-            console.log('delete failed ' + opts.api)
+            console.log('Delete failed ' + err.message)
+            console.log('Delete failed ' + opts.api)
 			// Ignore the "does not exist" message because
 			// we want to keep deleting even if one of the 
 			// proxies has been deleted by the user.
@@ -137,9 +137,8 @@ function createCaches(c,cb){
 function deleteCaches(c,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('deleting cache ' + c.name)
+    console.log('Deleting cache ' + c.name)
     opts.cache = c.name
-    console.log(opts)
     cb(null,sdk.deletecache(opts))    
 }
 
@@ -153,9 +152,8 @@ function createKVMs(kvm,cb){
 function deleteKVMs(kvm,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('deleting KVM ' + kvm.name)
+    console.log('Deleting KVM: ' + kvm.name)
     opts.mapName = kvm.name
-    console.log(opts)
     cb(null,sdk.deleteKVM(opts))
 }
 
