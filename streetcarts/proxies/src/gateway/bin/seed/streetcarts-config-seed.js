@@ -19,230 +19,373 @@ var consumerSecret = '';
 
 var args = process.argv;
 
-if (args[2] === 'configure-edge') {
+if (args[2] === 'configure-baas') {
+    
+    var baas = {
+        orgName: "",
+        appName: "",
+        apiHost: "", 
+        clientId: "",
+        clientSecret: ""
+    };
 
-    var username;
-    var password;
+    var schema = {
+        properties: {
+            baasorg: {
+                message: 'Your API BaaS organization',
+                required: true
+            },
+            baasapp: {
+                message: 'Your API BaaS application',
+                required: true
+            },
+            baasapi: {
+                message: 'API BaaS API URL',
+                default: 'https://apibaas-trial.apigee.net',
+                required: true
+            },
+            baasclientid: {
+                message: 'API BaaS client ID',
+                hidden: true,
+                required: true
+            },
+            baasclientsecret: {
+                message: 'API BaaS client secret',
+                hidden: true,
+                required: true
+            }
+        }
+    };
 
     prompt.start();
-    
-    prompt.get([{
-            name: 'Username',
-            required: true
-        }, {
-            name: 'Password',
-            hidden: true,
-            required: true
-    }], function (error, result) {
-        if (error) { 
-            console.log(error);
-            return 1;
-        } else {
-            username = result.Username;
-            password = result.Password;
-            
-            fs.readFile(args[3], 'utf8', function (error, data) {
-                if (error) {
-                    console.log('\nGot read file error: \n' + error);            
-                } else {
-                    var apigeeConfig = JSON.parse(data);
-                    var edgeConfig = apigeeConfig.edge;
-                    var auth = "Basic " + new Buffer(username +
-                        ":" + password).toString("base64");
-                    
-                    // create vault and entries
-                    if (edgeConfig.vaults) {
-                        var options = {
-                            "auth": auth,
-                            "config": apigeeConfig
-                        };
-                        
-                        apigeeAppConfig.createVaults(options, function (error,
-							response) {
-                            if (error) {
-                                if (error.statusCode === 500) {
-                                    
-                                }
-                                if (error.statusCode != '201') {
-                                console.log('\nError creating vault: \n' +
-                                    JSON.stringify(error));
-                                }
-                            } else {
-                                return console.log('\nVaults created.');
-                            }
-                        });                
-                    }            
-                }
-            });    
-        }
-    });
-    
-} else if (args[2] === 'configure-baas') {
 
-    fs.readFile(args[3], 'utf8', function (error, data) {
-        if (error) {
-            console.log('\nGot read file error: \n' + error);            
-        } else {
-            var apigeeConfig = JSON.parse(data);
-            var baasConfig = apigeeConfig.apiBaaS;
-            
-            if (baasConfig.collections) {
-                var options = {
-                    "config": apigeeConfig
-                };
-                apigeeAppConfig.createBaasCollections(options, function (error, 
-					response) {
+    prompt.get(schema,
+        function (error, result) {
+            if (error) {
+            } else {
+                baas.orgName = result.baasorg;
+                baas.appName = result.baasapp;
+                baas.apiHost = result.baasapi;
+                baas.clientId = result.baasclientid;
+                baas.clientSecret = result.baasclientsecret;
+
+                fs.readFile(args[3], 'utf8', function (error, data) {
                     if (error) {
-                        console.log('\nGot create collections error: \n' + 
-						JSON.stringify(error));
+                        console.log('\nGot read file error: \n' + error);            
                     } else {
-                        // console.log('\nRoles created.');
+                        var apigeeConfig = JSON.parse(data);
+                        var baasConfig = apigeeConfig.apiBaaS;
+                        baasConfig.baasApp = baas;
+                        
+                        if (baasConfig.roles) {
+                            var options = {
+                                "config": apigeeConfig
+                            };
+                            apigeeAppConfig.createBaasRoles(baasConfig, function (error,
+                                response) {
+                                if (error) {
+                                    console.log('\nGot create roles error: \n' +
+                                        JSON.stringify(error));
+                                } else {
+                                    // console.log('\nRoles created.');
+                                }
+                            });
+                        }
+                        if (baasConfig.groups) {
+                            apigeeAppConfig.createBaasGroups(baasConfig, function (error, 
+            					response) {
+                                if (error) {
+                                    console.log('\nError while creating API BaaS groups: \n' + 
+                                        error);
+                                } else {
+                                    async.each(baasConfig.groups, function (group, 
+            							callback) {
+                                        if (group.roles) {
+                                            var options = {
+                                                "config": apigeeConfig
+                                            };
+                                            apigeeAppConfig.assignBaasRolesToGroups(baasConfig, 
+                                                function (error, response) {
+                                                if (error) {
+                                                    console.log('\nError while assigning roles to groups: \n' + 
+                                                        JSON.stringify(error));
+                                                } else {
+                                                    console.log('\nAssigned roles to groups.');
+                                                }
+                                            });
+                                        }
+                                    },
+                                    function (error) {
+                                        if (error) {
+                                            callback(error, null);
+                                        } else {
+                                            callback(null, 'Added groups.');
+                                        }
+                                    });                        
+                                }
+                            });
+                        }
                     }
-                });
+                });                    
             }
-            if (baasConfig.roles) {
-                var options = {
-                    "config": apigeeConfig
-                };
-                apigeeAppConfig.createBaasRoles(options, function (error, 
-					response) {
-                    if (error) {
-                        console.log('\nGot create roles error: \n' + 
-						JSON.stringify(error));
-                    } else {
-                        // console.log('\nRoles created.');
-                    }
-                });
+        }
+    );
+    
+} else if (args[2] === 'register-users') {
+    
+    var userName;
+    var password;
+    var orgName;
+    var envName;
+    var domain;
+    var appName;
+    var mgmtApiHost;
+        
+    var schema = {
+        properties: {
+            username: {
+                message: 'Your Edge username',
+                required: true,
+
+                default: 'steve.traut@apigee.com'
+                
+            },
+            password: {
+                message: 'Your Edge password',
+                required: true,
+                hidden: true,
+                
+                default: 'GAgNikKusbu5'
+                
+            },
+            edgeorg: {
+                message: 'The Edge organization that hosts StreetCarts',
+                required: true,
+                
+                default: 'apptraining'
+                
+            },
+            edgeenv: {
+                message: 'The environment the proxies are deployed to',
+                default: 'test',
+                required: true
+            },
+            proxyhost: {
+                message: 'The host part of the URL to your API proxies',
+                default: 'apigee.net',
+                required: true
+            },
+            appname: {
+                message: 'The name of the StreetCarts app',
+                default: 'streetcarts',
+                required: true
+            },
+            mgmtApiHost: {
+                message: 'Edge management API URL',
+                default: 'https://api.enterprise.apigee.com',
+                required: true
             }
-            if (baasConfig.groups) {
+        }
+    };
+    
+    prompt.start();
+
+    prompt.get(schema,
+        function (error, result) {
+            if (error) {
+            } else {
+                orgName = result.edgeorg;
+                envName = result.edgeenv;
+                domain = result.proxyhost;
+                appName = result.appname;
+                mgmtApiHost = result.mgmtApiHost;
+                userName = result.username;
+                password = result.password;
+
+                var userDataFilePath = args[3];
+
+        		var devApp = {
+        		    name: "SC-APP-UNLIMITED",
+        		    apiProducts : "SC-PRODUCT-UNLIMITED",
+        		    attributes:[{
+        		        name: "DisplayName",
+        		        value: "SC-APP-UNLIMITED"
+        		    }],
+        		    callback: "http://streetcarts.com",
+        		    email: "streetcarts@example.com"
+        	    };
+    
                 var options = {
-                    "config": apigeeConfig
+                    userName: userName,
+                    password: password,
+                    host: mgmtApiHost,
+                    organization: orgName
                 };
-                apigeeAppConfig.createBaasGroups(options, function (error, 
-					response) {
+                
+                apigeeAppConfig.getAppKeyAndSecret(devApp, options, function (error, response){
                     if (error) {
-                        console.log('\nError while creating API BaaS groups: \n' + 
-                            error);
+                        return console.log('\nError getting app key and secret: ' + 
+                            JSON.stringify(error));
                     } else {
-                        async.each(baasConfig.groups, function (group, 
-							callback) {
-                            if (group.roles) {
-                                var options = {
-                                    "config": apigeeConfig
-                                };
-                                apigeeAppConfig.assignBaasRolesToGroups(options, 
-                                    function (error, response) {
+                        consumerKey = response.consumerKey;
+                        consumerSecret = response.consumerSecret;                    
+                        console.log('\nConsumer key: ' + consumerKey);
+                        
+                        appUri = 'https://' + orgName + '-' + envName + '.' + domain +
+                        '/v1/' + appName;
+
+                        fs.readFile(userDataFilePath, 'utf8', function (error, data) {
+                            if (error) {
+                                console.log('\nGot read file error: \n' + error);
+                            } else {
+                                var userData = JSON.parse(data);
+                                createUserAccounts(userData, function (error, response) {
                                     if (error) {
-                                        console.log('\nError while assigning roles to groups: \n' + 
-                                            JSON.stringify(error));
+                                        console.log('\nError creating user account: \n' + error);
                                     } else {
-                                        console.log('\nAssigned roles to groups.');
+                                        return console.log('\nUser accounts created.');
                                     }
                                 });
-                            }
-                        },
-                        function (error) {
-                            if (error) {
-                                callback(error, null);
-                            } else {
-                                callback(null, 'Added groups.');
                             }
                         });                        
                     }
                 });
             }
         }
-    });
-    
-} else if (args[2] === 'register-users') {
-    var streetcartsConfigFilePath = args[3];
-    var userDataFilePath = args[4];
-    
-    fs.readFile(streetcartsConfigFilePath, 'utf8', function (error, streetcartsConfig) {
-        if (error) {
-            console.log('\nError reading StreetCarts config file: \n' + error);
-        } else {
-            var edgeConfig = JSON.parse(streetcartsConfig).edge;
-            orgName = edgeConfig.orgName;
-            envName = edgeConfig.envName;
-            domain = edgeConfig.appApiHost;
-            appName = edgeConfig.appName;
-            
-            appUri = 'https://' + orgName + '-' + envName + '.' + domain +
-            '/v1/' + appName;
-            
-            var clientCredentials = edgeConfig.clientCredentials[0];
-            
-            consumerKey = clientCredentials.consumerKey;
-            consumerSecret = clientCredentials.consumerSecret;
-            fs.readFile(userDataFilePath, 'utf8', function (error, data) {
-                if (error) {
-                    console.log('\nGot read file error: \n' + error);
-                } else {
-                    var userData = JSON.parse(data);
-                    createUserAccounts(userData, function (error, response) {
-                        if (error) {
-                            console.log('\nError creating user account: \n' + error);
-                        } else {
-                            return console.log('\nUser accounts created.');
-                        }
-                    });
-                }
-            });
-        }
-    });
+    );
     
 } else if (args[2] === 'create-foodcarts') {
     
-    var streetcartsConfigFilePath = args[3];
-    var foodcartDataFilePath = args[4];
-    var userDataFilePath = args[5];
-    
-    fs.readFile(streetcartsConfigFilePath, 'utf8', function (error, streetcartsConfig) {
-        if (error) {
-            console.log('\nError reading StreetCarts config file: \n' + error);
-        } else {        
-            var edgeConfig = JSON.parse(streetcartsConfig).edge;
-            orgName = edgeConfig.orgName;
-            envName = edgeConfig.envName;
-            domain = edgeConfig.appApiHost;
-            appName = edgeConfig.appName;
-            
-            appUri = 'https://' + orgName + '-' + envName + '.' + domain +
-            '/v1/' + appName;
-            
-            var clientCredentials = edgeConfig.clientCredentials[0];
-            
-            consumerKey = clientCredentials.consumerKey;
-            consumerSecret = clientCredentials.consumerSecret;
-            fs.readFile(foodcartDataFilePath, 'utf8', function (error, foodcartsData) {
-                if (error) {
-                    console.log('\nError reading foodcart data file: \n' + error);
-                } else {
-                    // Got the foodcart data.
-                    var foodcartsData = JSON.parse(foodcartsData);
-                    
-                    fs.readFile(userDataFilePath, 'utf8', function (error, usersData) {
-                        if (error) {
-                            console.log('\nError reading user data file: \n' + error);
-                        } else {
-                            var usersData = JSON.parse(usersData);
-                            
-                            createFoodcarts(foodcartsData, usersData, 
-                                function (error, response) {
-                                if (error) {
-                                    console.log('\nError creating foodcart: \n' + 
-                                        JSON.stringify(error));
-                                } else {
-                                    return console.log('Foodcarts created');
-                                }
-                            });
-                        }
-                    });
-                }
-            });                                
+    var userName;
+    var password;
+    var orgName;
+    var envName;
+    var domain;
+    var appName;
+    var mgmtApiHost;
+        
+    var schema = {
+        properties: {
+            username: {
+                message: 'Your Edge username',
+                required: true
+            },
+            password: {
+                message: 'Your Edge password',
+                required: true,
+                hidden: true
+            },
+            edgeorg: {
+                message: 'The Edge organization that hosts StreetCarts',
+                required: true
+            },
+            edgeenv: {
+                message: 'The environment the proxies are deployed to',
+                default: 'test',
+                required: true
+            },
+            proxyhost: {
+                message: 'The host part of the URL to your API proxies',
+                default: 'apigee.net',
+                required: true
+            },
+            appname: {
+                message: 'The name of the StreetCarts app',
+                default: 'streetcarts',
+                required: true
+            },
+            mgmtApiHost: {
+                message: 'Edge management API URL',
+                default: 'https://api.enterprise.apigee.com',
+                required: true
+            }
         }
-    });
+    };
+    
+    prompt.start();
+
+    prompt.get(schema,
+        function (error, result) {
+            if (error) {
+            } else {
+                orgName = result.edgeorg;
+                envName = result.edgeenv;
+                domain = result.proxyhost;
+                appName = result.appname;
+                mgmtApiHost = result.mgmtApiHost;
+                userName = result.username;
+                password = result.password;
+
+        		var devApp = {
+        		    name: "SC-APP-UNLIMITED",
+        		    apiProducts : "SC-PRODUCT-UNLIMITED",
+        		    attributes:[{
+        		        name: "DisplayName",
+        		        value: "SC-APP-UNLIMITED"
+        		    }],
+        		    callback: "http://streetcarts.com",
+        		    email: "streetcarts@example.com"
+        	    };
+    
+                var options = {
+                    userName: userName,
+                    password: password,
+                    host: mgmtApiHost,
+                    organization: orgName
+                };
+                
+                var foodcartDataFilePath = args[3];
+                var userDataFilePath = args[4];
+
+                apigeeAppConfig.getAppKeyAndSecret(devApp, options, function (error, response){
+                    if (error) {
+                        return console.log('\nError getting app key and secret: ' + 
+                            JSON.stringify(error));
+                    } else {
+                        consumerKey = response.consumerKey;
+                        consumerSecret = response.consumerSecret;                    
+                        console.log('\nConsumer key: ' + consumerKey);
+                
+                        appUri = 'https://' + orgName + '-' + envName + '.' + domain +
+                        '/v1/' + appName;
+
+                        fs.readFile(userDataFilePath, 'utf8', function (error, data) {
+                            if (error) {
+                                console.log('\nGot read file error: \n' + error);
+                            } else {
+                                fs.readFile(foodcartDataFilePath, 'utf8', function (error, foodcartsData) {
+                                    if (error) {
+                                        console.log('\nError reading foodcart data file: \n' + error);
+                                    } else {
+                                        // Got the foodcart data.
+                                        var foodcartsData = JSON.parse(foodcartsData);
+            
+                                        fs.readFile(userDataFilePath, 'utf8', function (error, usersData) {
+                                            if (error) {
+                                                console.log('\nError reading user data file: \n' + error);
+                                            } else {
+                                                var usersData = JSON.parse(usersData);
+                    
+                                                createFoodcarts(foodcartsData, usersData, 
+                                                    function (error, response) {
+                                                    if (error) {
+                                                        console.log('\nError creating foodcart: \n' + 
+                                                            JSON.stringify(error));
+                                                    } else {
+                                                        return console.log('Foodcarts created');
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });                                
+                            }
+                        });                        
+                    }
+                });            
+            }
+        }
+    );
 } else {
 
     // Display help text.
@@ -308,7 +451,6 @@ function createFoodcarts(foodcartsData, usersData, callback) {
     console.log('\n\Creating foodcarts.');
     endpointPath = '/foodcarts';
     var uri = appUri + endpointPath;
-
     
     if (foodcartsData.foodcarts.length > 0) {
         

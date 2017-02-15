@@ -6,205 +6,14 @@ var sleep = require('sleep');
 
 module.exports = {
 
-    createVaults: function (configOptions, callback) {
-    
-        var auth = configOptions.auth;
-        var edgeConfig = configOptions.config.edge;
-        var mgmtApiHost = edgeConfig.mgmtApiHost;
-        var orgName = edgeConfig.orgName;
-        var envName = edgeConfig.envName;
-        
-        var vaults = edgeConfig.vaults;
-        
-        if (vaults.length > 0) {
-            
-            async.each(vaults, function (vault, callback) {
-            
-                var vaultName = vault.name;
-                var vaultScope = vault.scope;
-                var vaultEntries = vault.entries;
+    createBaasGroups: function (baasConfig, callback) {
 
-                var uri = 'https://' + mgmtApiHost + '/v1/organizations/' + 
-                    orgName + '/environments/' + envName + '/vaults/' + vaultName;                    
-                
-                var options = {
-                    uri: uri,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': auth
-                    },
-                    method: "DELETE"
-                };
-                // To keep things clean, delete the vault if it's there.
-                deleteVault(vaultName, options, function(error, response){
-                    if (error) {
-                        callback(error, null);
-                    } else {                        
-                        uri = 'https://' + mgmtApiHost + '/v1/organizations/' + 
-                            orgName + '/environments/' + envName + '/vaults';
-
-                        var vaultBody = {
-                            "name": vaultName
-                        };
-                        
-                        options = {
-                            uri: uri,
-                            body: JSON.stringify(vaultBody),
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': auth
-                            },
-                            method: "POST"
-                        };
-                        
-                        console.log('\nCreating vault: ' + vaultName);
-
-                        return makeRequest(options, function (error, response) {
-                            if (error) {
-                                callback(error, null);
-                            } else if (response.statusCode == 500) {
-                                var responseBody = response.body;
-                                var message = JSON.parse(responseBody).message;
-                                var errorObject = new Error();
-                                errorObject.message = message;
-                                errorObject.statusCode = response.statusCode;
-                                callback(errorObject, null);
-                                
-                            } else {
-                                var responseBody = response.body;
-                                
-                                if (vaultEntries.length > 0)
-                                {
-                                    uri = 'https://' + 
-                                        mgmtApiHost + '/v1/organizations/' + 
-                                        orgName + '/environments/' + 
-                                        envName + '/vaults/' + 
-                                        vaultName + '/entries';
-                                    
-                                    async.each(vaultEntries, function (vaultEntry,
-                                        callback) {
-                                    
-                                        var entryName = vaultEntry.name;
-                                        var entryValue = vaultEntry.value;
-                                        
-                                        var body = {
-                                            "name": entryName,
-                                            "value": entryValue
-                                        };
-                                        
-                                        var options = {
-                                            uri: uri,
-                                            body: JSON.stringify(body),
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'Authorization': auth
-                                            },
-                                            method: "POST"
-                                        };
-                                        
-                                        console.log('\nAdding vault entry: ' +
-                                            entryName);
-                                        
-                                        makeRequest(options, function (error,
-                                            response) {
-                                            if (error && error.statusCode != '201')
-                                            {
-                                                callback(error, null);
-                                            } else {
-                                                var responseBody = response.body;
-                                                callback(null, responseBody);
-                                            }
-                                        });
-                                    },
-                                    function (error) {
-                                        if (error) {
-                                            callback(error, null);
-                                        } else {
-                                            callback(null, 'Added vault entries.');
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });                
-            },
-            function (error) {
-                if (error) {
-                    callback(error, null);
-                } else {
-                    callback(null, 'Added vault entries.');
-                }
-            });
-        } else {
-            callback('No vaults information was included in the configuration file.', null);
-        }
-    },
-
-    createBaasCollections: function (configOptions, callback) {
-
-        var baasConfig = configOptions.config.apiBaaS;
+        var clientId = baasConfig.baasApp.clientId;
+        var clientSecret = baasConfig.baasApp.clientSecret;
         
-        var clientId = baasConfig.clientCredentials.clientId;
-        var clientSecret = baasConfig.clientCredentials.clientSecret;
-        
-        var apiBaaSHost = baasConfig.apiHost;
-        var orgName = baasConfig.orgName;
-        var appName = baasConfig.appName;
-        
-        if (baasConfig.collections && baasConfig.collections.length > 0)
-        {
-            var collections = baasConfig.collections;
-            
-            async.each(collections, function (collection, callback) {
-                var collectionName = collection.name;
-                
-                var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + appName +
-                    '/' + collectionName + '?client_id=' + clientId +
-                    '&client_secret=' + clientSecret;
-                
-                var options = {
-                    uri: uri,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    method: "POST"
-                };
-                console.log('\nCreating collection: ' + collectionName);
-                return makeRequest(options, function (error, response) {
-                    if (error && error.statusCode != '201')
-                    {
-                        callback(error, null);
-                    } else if (response.statusCode == 400) {
-                        var body = response.body;
-                        var error = JSON.parse(body).error;
-                        callback(error, null);
-                    } else {
-                        var body = JSON.parse(response.body);
-                        callback(null, response);                        
-                    }
-                });                
-            },
-            function (error) {
-                if (error) {
-                    callback(error, null);
-                } else {
-                    callback(null, 'Added collections.');
-                }
-            });
-        }        
-    },
-    
-    createBaasGroups: function (configOptions, callback) {
-
-        var baasConfig = configOptions.config.apiBaaS;
-        
-        var clientId = baasConfig.clientCredentials.clientId;
-        var clientSecret = baasConfig.clientCredentials.clientSecret;
-        
-        var apiBaaSHost = baasConfig.apiHost;
-        var orgName = baasConfig.orgName;
-        var appName = baasConfig.appName;
+        var apiBaaSHost = baasConfig.baasApp.apiHost;
+        var orgName = baasConfig.baasApp.orgName;
+        var appName = baasConfig.baasApp.appName;
         
         if (baasConfig.groups && baasConfig.groups.length > 0)
         {
@@ -214,7 +23,7 @@ module.exports = {
                 var title = group.title;
                 var path = group.path;
                 
-                var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + 
+                var uri = apiBaaSHost + '/' + orgName + '/' + 
                     appName + '/groups/' + path + '?client_id=' + 
                     clientId + '&client_secret=' + clientSecret;
                 
@@ -228,7 +37,7 @@ module.exports = {
                             "title" : title
                         };
                         
-                        var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' +
+                        var uri = apiBaaSHost + '/' + orgName + '/' +
                             appName + '/groups?client_id=' + clientId + 
                             '&client_secret=' + clientSecret;
                             
@@ -273,16 +82,14 @@ module.exports = {
      * Create roles and permissions in API BaaS according to 
      * roles defined in the config file.
      */
-    createBaasRoles: function (configOptions, callback) {
+    createBaasRoles: function (baasConfig, callback) {
        
-        var baasConfig = configOptions.config.apiBaaS;
+        var clientId = baasConfig.baasApp.clientId;
+        var clientSecret = baasConfig.baasApp.clientSecret;
         
-        var clientId = baasConfig.clientCredentials.clientId;
-        var clientSecret = baasConfig.clientCredentials.clientSecret;
-        
-        var apiBaaSHost = baasConfig.apiHost;
-        var orgName = baasConfig.orgName;
-        var appName = baasConfig.appName;
+        var apiBaaSHost = baasConfig.baasApp.apiHost;
+        var orgName = baasConfig.baasApp.orgName;
+        var appName = baasConfig.baasApp.appName;
         
         if (baasConfig.roles && baasConfig.roles.length > 0)
         {
@@ -292,7 +99,7 @@ module.exports = {
                 var roleTitle = role.title;
                 var roleName = role.name;
                 
-                var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + appName + 
+                var uri = apiBaaSHost + '/' + orgName + '/' + appName + 
                     '/roles/' + roleName + '?client_id=' + clientId + 
                     '&client_secret=' + clientSecret;
                 
@@ -308,7 +115,7 @@ module.exports = {
                         };
                         
                         // Now create the new role from the config file.
-                        uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + 
+                        uri = apiBaaSHost + '/' + orgName + '/' + 
                             appName + '/roles?client_id=' + clientId +
                             '&client_secret=' + clientSecret;
                         
@@ -338,7 +145,7 @@ module.exports = {
                                     async.each(permissions, function (permission, 
                                         callback) {
                                     
-                                        var uri = 'https://' + apiBaaSHost + '/' +
+                                        var uri = apiBaaSHost + '/' +
                                             orgName + '/' + appName + 
                                             '/roles/' + roleName + 
                                             '/permissions?client_id=' + clientId +
@@ -397,15 +204,13 @@ module.exports = {
         }        
     },
     
+    assignBaasRolesToGroups: function (baasConfig, callback) {
     
-    assignBaasRolesToGroups: function (configOptions, callback) {
-    
-        var baasConfig = configOptions.config.apiBaaS;
-        var clientId = baasConfig.clientCredentials.clientId;
-        var clientSecret = baasConfig.clientCredentials.clientSecret;
-        var apiBaaSHost = baasConfig.apiHost;
-        var orgName = baasConfig.orgName;
-        var appName = baasConfig.appName;
+        var clientId = baasConfig.baasApp.clientId;
+        var clientSecret = baasConfig.baasApp.clientSecret;
+        var apiBaaSHost = baasConfig.baasApp.apiHost;
+        var orgName = baasConfig.baasApp.orgName;
+        var appName = baasConfig.baasApp.appName;        
         var groups = baasConfig.groups;
                 
         async.each(groups, function (group, callback) {
@@ -417,7 +222,7 @@ module.exports = {
                 async.each(roles, function (role, callback) {
                     var roleName = role.name;
                     
-                    var uri = 'https://' + apiBaaSHost + '/' + orgName + '/' + appName + 
+                    var uri = apiBaaSHost + '/' + orgName + '/' + appName + 
                         '/roles/' + roleName + '/groups/' + groupPath + '?client_id=' +
                             clientId + '&client_secret=' + clientSecret;
     
@@ -457,7 +262,52 @@ module.exports = {
                 callback(null, 'Added groups.');
             }
         });
+    },
+    
+    getAppKeyAndSecret: function (app, options, callback){
+
+        console.log('Getting app key and secret.');
+
+        var host = options.host;
+        var org = options.organization;
+	
+        var keySecret = {
+            "consumerKey": "",
+            "consumerSecret": ""
+        };
+        var appName = app.name;
+        var developerEmail = app.email;
+
+        var uri = host + '/v1/' +
+            'o/' + org + 
+            '/developers/' + developerEmail +
+            '/apps/' + appName;
+    
+        var requestOptions = {
+            uri: uri,
+            auth: {
+                user: options.userName,
+                password: options.password
+            },
+            method: "GET"
+        };
+        console.log('\nGetting key and secret: ' + JSON.stringify(requestOptions));
+        makeRequest(requestOptions, function (error, response) {
+            if (error) {
+                console.log('\nCould not get app for key/secret: ' +
+                    error);
+                    callback(error, null);
+            } else {
+                console.log("\nGot consumer key and secret");
+                keySecret.consumerKey =
+                    JSON.parse(response.body).credentials[0].consumerKey;
+                keySecret.consumerSecret = 
+                    JSON.parse(response.body).credentials[0].consumerSecret;
+    			callback(null, keySecret);
+            }
+        });
     }
+
 }
 
 function deleteGroup(groupName, uri, callback) {
@@ -508,24 +358,6 @@ function deleteRole(roleName, uri, callback) {
     });
 }
 
-function deleteVault(vaultName, options, callback) {
-    
-    console.log('\nDeleting vault: ' + vaultName)
-    return makeRequest(options, function (error, response) {
-        if (error)
-        {
-            if (error.statusCode !== 500)
-            {
-                callback(error, null);                
-            } else {
-                callback();
-            }
-        } else {
-            callback(null, response);
-        }
-    });
-}
-
 function makeRequest(options, callback) {
     
     sleep.sleep(1);
@@ -535,7 +367,8 @@ function makeRequest(options, callback) {
         
         if (error) {
             console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            console.log('Status code: ' + response.statusCode);
+            // console.log('\nResponse: ' + JSON.stringify(response));
+            // console.log('Status code: ' + response.statusCode);
             
             errorObject.message = error.message;
             errorObject.statusCode = error.statusCode;
@@ -554,8 +387,8 @@ function makeRequest(options, callback) {
             callback(errorObject, null);
         } else {            
             console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            console.log('Status code: ' + response.statusCode);
-            console.log('Response body: ' + response.body);
+            console.log('\nStatus code: ' + response.statusCode);
+            console.log('\nResponse body: ' + response.body);
             
             if (response.body) {
                 var callbackResponse;

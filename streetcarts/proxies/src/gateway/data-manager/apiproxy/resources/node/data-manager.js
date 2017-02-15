@@ -2,17 +2,13 @@ var request = require('request');
 var async = require('async');
 var apigee = require('apigee-access'); 
 
-var host = '{{BAASAPIREPLACE}}';
-var appPath = '/{{BAASORGREPLACE}}/{{BAASAPPREPLACE}}';
+var host = '@@BAASAPIREPLACE';
+var appPath = '/@@BAASORGREPLACE/@@BAASAPPREPLACE';
 
-// Name and scope for the Edge vault containing 
-// API BaaS credentials.
-var edgeVault = 'streetcarts';
-var edgeVaultScope = 'environment';
-
+// Name of the Edge key-value map containing API BaaS credentials.
 var edgeKVM = 'streetcarts';
 
-// Names of vault entries whose values are API BaaS
+// Names of KVM entries whose values are API BaaS
 // client ID and secret. Thesee should have been created
 // as part of app configuration.
 var dataStoreIdEntry = 'datastore-client-id';

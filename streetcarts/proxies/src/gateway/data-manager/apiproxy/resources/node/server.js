@@ -4,7 +4,6 @@
  * interacts with the data store. 
  */
 
-
 var dataManager = require('./data-manager');
 var express = require('express');
 var app = express();
@@ -15,7 +14,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
 
 // foodcarts proxy paths //
 
