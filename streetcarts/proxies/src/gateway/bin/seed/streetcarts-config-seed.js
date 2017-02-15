@@ -145,25 +145,16 @@ if (args[2] === 'configure-baas') {
         properties: {
             username: {
                 message: 'Your Edge username',
-                required: true,
-
-                default: 'steve.traut@apigee.com'
-                
+                required: true
             },
             password: {
                 message: 'Your Edge password',
                 required: true,
-                hidden: true,
-                
-                default: 'GAgNikKusbu5'
-                
+                hidden: true
             },
             edgeorg: {
                 message: 'The Edge organization that hosts StreetCarts',
-                required: true,
-                
-                default: 'apptraining'
-                
+                required: true
             },
             edgeenv: {
                 message: 'The environment the proxies are deployed to',
@@ -229,7 +220,6 @@ if (args[2] === 'configure-baas') {
                     } else {
                         consumerKey = response.consumerKey;
                         consumerSecret = response.consumerSecret;                    
-                        console.log('\nConsumer key: ' + consumerKey);
                         
                         appUri = 'https://' + orgName + '-' + envName + '.' + domain +
                         '/v1/' + appName;
@@ -344,7 +334,6 @@ if (args[2] === 'configure-baas') {
                     } else {
                         consumerKey = response.consumerKey;
                         consumerSecret = response.consumerSecret;                    
-                        console.log('\nConsumer key: ' + consumerKey);
                 
                         appUri = 'https://' + orgName + '-' + envName + '.' + domain +
                         '/v1/' + appName;
@@ -747,10 +736,10 @@ function makeRequest(options, callback) {
             callback(errorObject, null);
             process.exit();
         } else {
-            console.log('\nRequest: ' + options.method + ' ' + options.uri +
-                '\nHeaders: ' + JSON.stringify(options.headers));
-            console.log('Status code: ' + response.statusCode);
-            console.log('Response: ' + JSON.stringify(response));
+            // console.log('\nRequest: ' + options.method + ' ' + options.uri +
+            //     '\nHeaders: ' + JSON.stringify(options.headers));
+            // console.log('Status code: ' + response.statusCode);
+            // console.log('Response: ' + JSON.stringify(response));
 
             if (response.body) {
                 var bodyObj = JSON.parse(response.body);
