@@ -4,6 +4,8 @@ var gutil = require('gulp-util');
 var request = require('request');
 var sleep = require('sleep');
 
+// curl -v -X POST --header "Content-Type: application/x-www-form-urlencoded" -u $username:$password -d "command=install" "$env/v1/organizations/$org/apis/data-manager/revisions/$rev/npm"
+
 function installNodeModules() {
 	
 	var opts = baseopts();
@@ -63,14 +65,14 @@ function getAppKeyAndSecret(app, callback){
         '/developers/' + developerEmail +
         '/apps/' + appName;
     
-    var options = {
+    var requestOptions = {
         uri: uri,
         auth: {
             'bearer': options.token
         },
         method: "GET"
     };
-    makeRequest(options, function (error, response) {
+    makeRequest(requestOptions, function (error, response) {
         if (error) {
             console.log('\nCould not get app for key/secret: ' +
                 error);

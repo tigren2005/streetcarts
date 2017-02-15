@@ -11,7 +11,7 @@ function createApp(app){
     opts.apiProducts = app.apiProducts
     opts.email = app.email
     opts.callback = app.callback
-    
+    console.log('\nCreating app: ' + app.name)    
     sdk.createApp(opts)
     .then(function(appresponse){
         defer.resolve(appresponse)
@@ -28,6 +28,7 @@ function createApps(app,cb){
     opts.apiProducts = app.apiProducts
     opts.email = app.email
     opts.callback = app.callback
+    console.log('\nCreating app: ' + app.name)
     cb(null,sdk.createApp(opts))
 }
 
@@ -36,6 +37,7 @@ function deleteApps(app,cb){
     var opts=baseopts()
     opts.name=app.name
     opts.email = app.email
+    console.log('\nDeleting app: ' + app.name)
     cb(null,sdk.deleteApp(opts))
 }
 
@@ -43,6 +45,7 @@ function deleteProducts(prod,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.productName = prod.name,
+    console.log('\nDeleting product: ' + prod.name)
     cb(null,sdk.deleteProduct(opts))
 }
 
@@ -67,6 +70,7 @@ function createProducts (prod,cb) {
 	opts.quotaInterval = prod.quotaInterval
 	opts.quotaTimeUnit = prod.quotaTimeUnit
     opts.productName = prod.name        
+    console.log('\nCreating product: ' + prod.name)
     cb(null,sdk.createProduct(opts))
 }
 
@@ -74,7 +78,7 @@ function createDevelopers (dev,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     for(k in dev) opts[k]=dev[k]
-    console.log('Creating developer: ' + opts);
+    console.log('\nCreating developer: ' + dev.email)
     cb(null,sdk.createDeveloper(opts))
 }
 
@@ -82,6 +86,7 @@ function deleteDevelopers (dev,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.email = dev.email
+    console.log('\nDeleting developer: ' + dev.email)
     cb(null,sdk.deleteDeveloper(opts))
 }
 
@@ -92,14 +97,14 @@ function deleteApis(it,cb){
         opts.api = it.proxy
         sdk.undeploy(opts)
         .then(function(){
-            console.log('Undeployed ' + opts.api)
+            // console.log('Undeployed ' + opts.api)
             return sdk.delete(opts)
         },function(err){
             console.log(err)
             return sdk.delete(opts)
         })
         .then(function(){
-            console.log('Deleted ' + opts.api)
+            console.log('\nDeleting API: ' + opts.api)
             cb(null, 'done')
         },function(err){
             console.log('Delete failed ' + err.message)
@@ -123,6 +128,7 @@ function deployApis(it,cb) {
     var opts = baseopts()
     opts.directory = it.dir
     opts.api = it.proxy
+    console.log('\nDeploying API: ' + opts.api)
     cb(null, sdk.deployProxy(opts))
 }
 
@@ -130,28 +136,30 @@ function createCaches(c,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.cache = c.name
+    console.log('\nCreating cache ' + c.name)
     cb(null,sdk.createcache(opts))
 }
 
 function deleteCaches(c,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('Deleting cache ' + c.name)
     opts.cache = c.name
+    console.log('\nDeleting cache ' + c.name)
     cb(null,sdk.deletecache(opts))    
 }
 
 function createKVMs(kvm,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    opts.mapName = kvm.name    
+    opts.mapName = kvm.name
+    console.log('\nCreating KVM: ' + kvm.name)
     cb(null,sdk.createKVM(opts))
 }
 
 function deleteKVMs(kvm,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('Deleting KVM: ' + kvm.name)
+    console.log('\nDeleting KVM: ' + kvm.name)
     opts.mapName = kvm.name
     cb(null,sdk.deleteKVM(opts))
 }
@@ -162,6 +170,7 @@ function createKVMEntries(entry,cb){
     opts.mapName = entry.mapName
     opts.entryName = entry.name
     opts.entryValue = entry.value
+    console.log('\nCreating KVM entry: ' + entry.name + ' in ' + entry.mapName)
     cb(null,sdk.addEntryToKVM(opts))
 }
 
@@ -176,7 +185,7 @@ function run(arr, func){
         }
         q.all(results)
             .then(function(){
-                console.log('done')
+                // console.log('done')
                 defer.resolve()
             },function(err){
                 console.log(err)

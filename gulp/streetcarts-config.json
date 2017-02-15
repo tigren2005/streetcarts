@@ -111,7 +111,7 @@
 	],
 
 	"developers" : [{
-	    "email" : "streetcarts-developer@example.com",
+	    "email" : "streetcarts@example.com",
 	    "firstName" : "StreetCarts",
 	    "lastName" : "Developer",
 	    "userName": "streetcartsdev",
@@ -127,7 +127,7 @@
 		        "value": "SC-APP-UNLIMITED"
 		    }],
 		    "callback": "http://streetcarts.com",
-		    "email": "streetcarts-developer@example.com",
+		    "email": "streetcarts@example.com",
 		    "keyExpiresIn": "100000000000"
 	    },
 		{
@@ -138,7 +138,7 @@
 		        "value": "SC-APP-TRIAL"
 		    }],
 		    "callback": "http://streetcarts.com",
-		    "email": "streetcarts-developer@example.com",
+		    "email": "streetcarts@example.com",
 		    "keyExpiresIn": "100000000000"
 	    },
 		{
@@ -149,7 +149,7 @@
 		        "value": "SC-DATA-MANAGER-APP"
 		    }],
 		    "callback": "http://streetcarts.com",
-		    "email": "streetcarts-developer@example.com",
+		    "email": "streetcarts@example.com",
 		    "keyExpiresIn": "100000000000"
 		}
 	],

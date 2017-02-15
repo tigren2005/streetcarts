@@ -6,7 +6,7 @@ var querystring = require('querystring');
 var request = require('request');
 var sleep = require('sleep');
 
-function createGroups(groups) {
+function createConfigGroups(groups) {
 
 	var opts = baseopts();
 	var defer = q.defer();
@@ -72,7 +72,7 @@ function createGroups(groups) {
 	return defer.promise;		
 }
 
-function deleteGroups(groups) {
+function deleteConfigGroups(groups) {
 	var opts = baseopts();
 	var defer = q.defer();
 	
@@ -103,11 +103,11 @@ function deleteGroups(groups) {
         },
         function (error) {
             if (error) {
-                console.log("Could not delete groups: " + 
+                console.log("Could not delete config groups: " + 
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Deleted API BaaS groups.");
+                console.log("Deleted API BaaS config groups.");
 				defer.resolve();
             }
         });
@@ -115,7 +115,11 @@ function deleteGroups(groups) {
 	return defer.promise;		
 }
 
-function createRoles(roles) {
+function deleteAllFoodcarts() {
+    // call streetcarts API
+}
+
+function createConfigRoles(roles) {
 	var opts = baseopts();
 	var defer = q.defer();
 	
@@ -229,7 +233,7 @@ function createRoles(roles) {
     return defer.promise;			
 }
 
-function deleteRoles(roles) {
+function deleteConfigRoles(roles) {
 	var opts = baseopts();
 	var defer = q.defer();
 	
@@ -448,10 +452,10 @@ function makeRequest(options, callback) {
 
 module.exports = {
 
-    createGroups: createGroups,
-	deleteGroups: deleteGroups,
-	createRoles: createRoles,
-	deleteRoles: deleteRoles,
+    createGroups: createConfigGroups,
+	deleteGroups: deleteConfigGroups,
+	createRoles: createConfigRoles,
+	deleteRoles: deleteConfigRoles,
 	assignRolesToGroups: assignRolesToGroups
 
 }

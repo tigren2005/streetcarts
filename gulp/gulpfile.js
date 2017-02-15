@@ -9,6 +9,7 @@ var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jsonQuery = require('json-query');
+var replace = require('gulp-replace-task');
 var request = require('request');
 var requireDir = require('require-dir');
 var runSequence = require('run-sequence');
@@ -158,16 +159,22 @@ gulp.task('build',function(callback){
     };
     return new Promise(function(resolve, reject){
         gulp.src('../streetcarts/proxies/src/gateway/**/*')
-        // .pipe(build(replace_opts))
         .pipe(gulp.dest('./build/gateway/'))
         .on('end', resolve)
 		.on('error', reject);
 	})
 	.then(
 		function() {
-	        gulp.src('./build/gateway/data-manager/apiproxy/resources/node/data-manager.js')
-	        .pipe(build(replace_opts))
-	        .pipe(gulp.dest('./build/gateway/data-manager/apiproxy/resources/node/'))
+            gulp.src('./build/gateway/data-manager/apiproxy/resources/node/data-manager.js')
+                .pipe(replace({
+                    patterns: [
+                        { match: 'BAASAPIREPLACE', replacement: baas_api },
+                        { match: 'BAASORGREPLACE', replacement: baas_org },
+                        { match: 'BAASAPPREPLACE', replacement: baas_app }
+                    ]
+                })
+            )
+            .pipe(gulp.dest('./build/gateway/data-manager/apiproxy/resources/node/'));
     	},
 		function (error) {
 			console.log('\nBuild error: ' + error);
@@ -183,7 +190,6 @@ gulp.task('deploy', function(callback){
             'configure-baas', callback);
     // runSequence('clean-build', 'build', 'init-config', 'deploy-app',
     //         'configure-baas', 'seed-streetcarts', callback);
-    // runSequence('clean-build', 'build', 'init-config', 'deploy-app', callback);
 });
 
 // Set up the Edge pieces. Import proxies, products, developer, 
@@ -243,7 +249,7 @@ gulp.task('deploy-app', function(callback) {
             var org = gutil.env.org;
             var env = gutil.env.env;
             var uri = host + "v1/o/" + org +
-                "/developers/streetcarts-developer@example.com/apps/SC-DATA-MANAGER-APP";
+                "/developers/streetcarts@example.com/apps/SC-DATA-MANAGER-APP";
             var options = {
                 uri: uri,
                 auth: {
@@ -277,7 +283,7 @@ gulp.task('deploy-app', function(callback) {
                             console.log("\nCould not create KVM entries: " + 
                                 error.message);
                         } else {
-                            console.log("\nCreated KVM entries.");
+                            // console.log("\nCreated KVM entries.");
                         }
                     });
                     return edge.run(kvmEntries, edge.createKVMEntries)
@@ -290,7 +296,7 @@ gulp.task('deploy-app', function(callback) {
         })
 	.then(
         function () {
-            console.log('Installing Node modules.');
+            console.log('\nInstalling Node modules.');
             return edgeConfig.installNodeModules();
         },
         function (error) {
@@ -312,16 +318,16 @@ gulp.task('deploy-app', function(callback) {
 });
 
 // Remove BaaS configuration pieces from BaaS.
-gulp.task('clean-baas', ['init-config'], function(callback) {
-    return baasConfig.deleteGroups(groups)
+gulp.task('clean-baas-config', ['init-config'], function(callback) {
+    return baasConfig.deleteConfigGroups(groups)
 	.then(
         function() {
             console.log('\nDeleted groups');
-            return baasConfig.deleteRoles(roles);
+            return baasConfig.deleteConfigRoles(roles);
         },
         function(error) { 
             console.log('\nFailed to delete groups: ' + error);
-            return baasConfig.deleteRoles(roles);
+            return baasConfig.deleteConfigRoles(roles);
         }
 	).then(
         function() {
@@ -333,6 +339,29 @@ gulp.task('clean-baas', ['init-config'], function(callback) {
         }
     )
 });
+
+// Remove BaaS configuration pieces from BaaS.
+// gulp.task('clean-baas-all', ['init-config'], function(callback) {
+//     return baasConfig.deleteAllGroups()
+//     .then(
+//         function() {
+//             console.log('\nDeleted groups');
+//             // return baasConfig.deleteConfigRoles(roles);
+//         },
+//         function(error) {
+//             console.log('\nFailed to delete groups: ' + error);
+//             // return baasConfig.deleteConfigRoles(roles);
+//         }
+//     ).then(
+//         function() {
+//             console.log('\nDeleted roles');
+//             console.log('\nAll done cleaning API BaaS.');
+//         },
+//         function(error) {
+//             console.log('\nFailed to delete roles: ' + error);
+//         }
+//     )
+// });
 
 // Add user groups and roles to BaaS.
 gulp.task('configure-baas', ['init-config'], function(callback) {
