@@ -358,8 +358,7 @@ if (args[2] === 'configure-baas') {
                                                 createFoodcarts(foodcartsData, usersData, 
                                                     function (error, response) {
                                                     if (error) {
-                                                        console.log('\nError creating foodcart: \n' + 
-                                                            JSON.stringify(error));
+                                                        console.log(JSON.stringify(error));
                                                     } else {
                                                         return console.log('Foodcarts created');
                                                     }
@@ -479,8 +478,7 @@ function createFoodcarts(foodcartsData, usersData, callback) {
                     
                     makeRequest(options, function (error, response) {
                         if (error) {
-                            console.log('\nError creating foodcart:\n ' + 
-                                JSON.stringify(error));
+                            // console.log(JSON.stringify(error));
                             callback(error, null);
                         } else {
                             var foodcart;

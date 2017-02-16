@@ -16,6 +16,7 @@
     "del": "^2.2.2",
     "gulp": "*",
     "gulp-build": "^0.5.3",
+    "gulp-replace-task": "^0.11.0",
     "gulp-util": "^3.0.7",
     "json-query": "2.2.0",
     "q": "*",

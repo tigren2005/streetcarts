@@ -291,7 +291,6 @@ module.exports = {
             },
             method: "GET"
         };
-        console.log('\nGetting key and secret: ' + JSON.stringify(requestOptions));
         makeRequest(requestOptions, function (error, response) {
             if (error) {
                 console.log('\nCould not get app for key/secret: ' +
@@ -386,9 +385,9 @@ function makeRequest(options, callback) {
             errorObject.statusCode = response.statusCode;
             callback(errorObject, null);
         } else {            
-            console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            console.log('\nStatus code: ' + response.statusCode);
-            console.log('\nResponse body: ' + response.body);
+            // console.log('\nRequest: ' + options.method + ' ' + options.uri);
+            // console.log('\nStatus code: ' + response.statusCode);
+            // console.log('\nResponse body: ' + response.body);
             
             if (response.body) {
                 var callbackResponse;
