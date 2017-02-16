@@ -16,7 +16,7 @@ StreetCarts illustrates the following:
 * Enforcing two distinct client access levels with the Quota policy.
 * Suppressing traffic spikes with the Spike Arrest policy.
 * Node.js modules to integrate an API BaaS data store with Edge proxies.
-* Storing sensitive credential data in the Edge secure store (vault).
+* Storing sensitive credential data in an Edge encrypted key-value map (KVM).
 
 ![StreetCarts diagram](https://github.com/apigee/streetcarts/blob/master/streetcarts-diagram.png).
 
