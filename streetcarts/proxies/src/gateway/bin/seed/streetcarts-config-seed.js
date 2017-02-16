@@ -478,7 +478,6 @@ function createFoodcarts(foodcartsData, usersData, callback) {
                     
                     makeRequest(options, function (error, response) {
                         if (error) {
-                            // console.log(JSON.stringify(error));
                             callback(error, null);
                         } else {
                             var foodcart;
