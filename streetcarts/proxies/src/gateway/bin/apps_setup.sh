@@ -122,6 +122,19 @@ curl -u $username:$password \
 "entry" : [ { "name" : "X-DATA-MANAGER-KEY", "value" : "'$key'" }]
 }'
 
+echo -e "\n**** CREATE A KVM AND ADD THE API BAAS CLIENT ID AND SECRET TO IT"
+curl -u $username:$password \
+  $env/v1/o/$org/environments/$deployenv/keyvaluemaps \
+  -H "Content-Type: application/json" -X POST -d \
+'{
+"name" : "streetcarts",
+"encrypted" : "true",
+"entry" : [
+{ "name" : "datastore-client-id", "value" : "'$baasclientid'" },
+{ "name" : "datastore-client-secret", "value" : "'$baasclientsecret'" },
+{ "name" : "datastore-client-token", "value" : "" }
+]}'
+
 echo -e "\n**** BASE64 ENCODE THE KEY:SECRET FOR THE DATA-MANAGER APP"
 auth=$(echo -ne "$key:$secret" | base64);
 echo -e "\n**** Base64 encoded credentials:  $auth ****"

@@ -87,27 +87,27 @@
                             </includes>
                             <replacements>
                                 <replacement>
-                                  <token>ORGNAMEREPLACE</token>
+                                  <token>@@ORGNAMEREPLACE</token>
                                   <value>${org}</value>
                                 </replacement>
                                 <replacement>
-                                  <token>ENVNAMEREPLACE</token>
+                                  <token>@@ENVNAMEREPLACE</token>
                                   <value>${apigee.env}</value>
                                 </replacement>
                                 <replacement>
-                                  <token>PROXYHOSTREPLACE</token>
+                                  <token>@@PROXYHOSTREPLACE</token>
                                   <value>${proxyhost}</value>
                                 </replacement>
                                 <replacement>
-                                  <token>BAASORGREPLACE</token>
+                                  <token>@@BAASORGREPLACE</token>
                                   <value>${baasorg}</value>
                                 </replacement>
                                 <replacement>
-                                  <token>BAASAPPREPLACE</token>
+                                  <token>@@BAASAPPREPLACE</token>
                                   <value>${baasapp}</value>
                                 </replacement>
                                 <replacement>
-                                  <token>BAASAPIREPLACE</token>
+                                  <token>@@BAASAPIREPLACE</token>
                                   <value>${baasapi}</value>
                                 </replacement>
                             </replacements>

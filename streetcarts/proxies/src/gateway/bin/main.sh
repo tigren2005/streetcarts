@@ -8,20 +8,22 @@ usage() {
     CMD=`basename $0`
     echo "Usage:"
     echo "$CMD [-u email] [-p password] [-o org-name] [-e env] [-d deployenv] [-r rev] [-x proxyhost] [-g baasorg] [-a baasapi] [-b baasapp]"
-    echo "              username:       Pmail address of Edge user"
-    echo "              password:       Password of Edge user"
-    echo "              org-name:       Name of existing organization"
-    echo "              env:            Management API URL as https://api.enterprise.apigee.com or https://api.e2e.apigee.net"
-    echo "              deployenv:      The environment the proxies are deployed to"
-    echo "              rev:            Data manager proxy current revision"
-    echo "              proxyhost:      The host part of the URL to your API proxies"
-    echo "              baasorg:        The API BaaS organization you want to use. Does not need to be the same as your Edge organization."
-    echo "              baasapp:        The name of your API BaaS application"
-    echo "              baasapi:        The API BaaS API URL; https://api.usergrid.com for the cloud"
+    echo "              username:         Pmail address of Edge user"
+    echo "              password:         Password of Edge user"
+    echo "              org-name:         Name of existing organization"
+    echo "              env:              Management API URL as https://api.enterprise.apigee.com or https://api.e2e.apigee.net"
+    echo "              deployenv:        The environment the proxies are deployed to"
+    echo "              rev:              Data manager proxy current revision"
+    echo "              proxyhost:        The host part of the URL to your API proxies"
+    echo "              baasorg:          The API BaaS organization you want to use. Does not need to be the same as your Edge organization."
+    echo "              baasapp:          The name of your API BaaS application"
+    echo "              baasapi:          The API BaaS API URL; https://apibaas-trial.apigee.net for the cloud"
+    echo "              baasclientid:     The API BaaS client ID; located in your BaaS admin portal"
+    echo "              baasclientsecret: The API BaaS client secret; located in your BaaS admin portal"
     exit 1
 }
 
-while getopts "u:p:o:e:d:r:x:h:g:a:b" opt; do
+while getopts "u:p:o:e:d:r:x:h:g:a:b:c:s" opt; do
 case $opt in
 # variable options
     u)  username=$OPTARG ;;
@@ -34,6 +36,8 @@ case $opt in
     g)  baasorg=$OPTARG ;;
     a)  baasapp=$OPTARG ;;
     b)  baasapi=$OPTARG ;;
+    c)  baasclientid=$OPTARG ;;
+    s)  baasclientsecret=$OPTARG ;;
     h)  usage ;;
 
 esac
@@ -141,12 +145,25 @@ fi
 echo -e
 
 if [ -z "${baasapi}" ]; then
-    BAASAPI_DEFAULT="https://api.usergrid.com"
+    BAASAPI_DEFAULT="https://apibaas-trial.apigee.net"
     echo -e "The API BaaS API URL. Select the default if you are using the cloud version."
     read -p "Default is [$BAASAPI_DEFAULT]: " baasapi
     baasapi="${baasapi:-$BAASAPI_DEFAULT}"
 fi
 
+echo -e
+
+if [ -z "${baasclientid}" ]; then
+    echo -e "The client ID for your API BaaS application."
+    read -sp "API BaaS client ID: " baasclientid
+fi
+
+echo -e
+
+if [ -z "${baasclientsecret}" ]; then
+    echo -e "The client secret for your API BaaS application."
+    read -sp "API BaaS client secret: " baasclientsecret
+fi
 
 # Verify Apigee admin credentials
 
