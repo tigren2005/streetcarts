@@ -1,0 +1,316 @@
+{	
+	"apilist" : [
+	    { "dir": "build/gateway/items", "proxy": "items" }, 
+	    { "dir": "build/gateway/accesstoken", "proxy": "accesstoken" }, 
+	    { "dir": "build/gateway/data-manager", "proxy": "data-manager" }, 
+	    { "dir": "build/gateway/foodcarts", "proxy": "foodcarts" }, 
+	    { "dir": "build/gateway/menus", "proxy": "menus" }, 
+	    { "dir": "build/gateway/reviews", "proxy": "reviews" }, 
+	    { "dir": "build/gateway/users", "proxy": "users" }
+	],
+
+	"apiProducts" : [
+		{
+		    "apiResources":["/"],
+		    "approvalType": "auto",
+		    "attributes":[ {
+		        "name": "access",
+		        "value": "public"
+		    }],
+		    "displayName": "SC-PRODUCT-UNLIMITED",
+		    "description": "SC-PRODUCT-UNLIMITED",
+		    "name": "SC-PRODUCT-UNLIMITED",
+		    "environments":[ 
+		        "test", 
+		        "prod"
+		    ],
+		    "quota": "1000000",
+		    "quotaInterval": "1",
+		    "quotaTimeUnit": "second",
+		    "scopes":[
+		        "owner.read",
+		        "owner.create",
+		        "owner.update",
+		        "owner.delete",
+		        "reviewer.create",
+		        "reviewer.read",
+		        "manager.update",
+		        "manager.read"
+		    ],
+		    "proxies":[
+		        "foodcarts",
+		        "menus",
+		        "items",
+		        "users",
+		        "accesstoken"
+		    ]
+		}, 
+		{
+		    "apiResources":["/"],
+		    "approvalType": "auto",
+		    "attributes":[ {
+		        "name": "access",
+		        "value": "public"
+		    }],
+		    "displayName": "SC-PRODUCT-TRIAL",
+		    "name": "SC-PRODUCT-TRIAL",
+		    "environments" : [
+		        "test",
+		        "prod"
+		    ],
+		    "scopes":[
+		        "openid",
+		        "atms",
+		        "branches"
+		    ],
+		    "proxies":[
+		        "foodcarts",
+		        "menus",
+		        "items",
+		        "users",
+		        "accesstoken"
+		    ],
+		    "quota": "1000",
+		    "quotaInterval": "1",
+		    "quotaTimeUnit": "day",
+		    "scopes":[
+		        "owner.read",
+		        "owner.create",
+		        "owner.update",
+		        "owner.delete",
+		        "reviewer.create",
+		        "reviewer.read",
+		        "manager.update",
+		        "manager.read"
+		    ]
+		}, 
+		{
+		    "apiResources":[
+		        "/PUT/v1/streetcarts/data-manager/**",
+		        "/DELETE/v1/streetcarts/data-manager/**",
+		        "/POST/v1/streetcarts/data-manager/**",
+		        "/GET/v1/streetcarts/data-manager/**"
+		    ],
+		    "approvalType": "auto",
+		    "attributes" : [ {
+		        "name": "access",
+		        "value": "public"
+		    }],
+		    "description": "",
+		    "displayName": "SC-DATA-MANAGER-PRODUCT",
+		    "environments" : [
+		        "test",
+		        "prod"
+		    ],
+		    "name": "SC-DATA-MANAGER-PRODUCT",
+		    "proxies":[
+		        "data-manager"
+		    ],
+		    "scopes" : []
+		}
+	],
+
+	"developers" : [{
+	    "email" : "streetcarts@example.com",
+	    "firstName" : "StreetCarts",
+	    "lastName" : "Developer",
+	    "userName": "streetcartsdev",
+	    "status": "active"
+	}],
+
+	"apps" : [
+		{
+		    "name": "SC-APP-UNLIMITED",
+		    "apiProducts" : "SC-PRODUCT-UNLIMITED",
+		    "attributes":[{
+		        "name": "DisplayName",
+		        "value": "SC-APP-UNLIMITED"
+		    }],
+		    "callback": "http://streetcarts.com",
+		    "email": "streetcarts@example.com",
+		    "keyExpiresIn": "100000000000"
+	    },
+		{
+		    "name": "SC-APP-TRIAL",
+		    "apiProducts": "SC-PRODUCT-TRIAL",
+		    "attributes":[ {
+		        "name": "DisplayName",
+		        "value": "SC-APP-TRIAL"
+		    }],
+		    "callback": "http://streetcarts.com",
+		    "email": "streetcarts@example.com",
+		    "keyExpiresIn": "100000000000"
+	    },
+		{
+		    "name": "SC-DATA-MANAGER-APP",
+		    "apiProducts": "SC-DATA-MANAGER-PRODUCT",
+		    "attributes":[ {
+		        "name": "DisplayName",
+		        "value": "SC-DATA-MANAGER-APP"
+		    }],
+		    "callback": "http://streetcarts.com",
+		    "email": "streetcarts@example.com",
+		    "keyExpiresIn": "100000000000"
+		}
+	],
+
+	"kvms" : [
+        {
+    	    "name": "DATA-MANAGER-API-KEY"
+    	},
+        {
+            "name" : "streetcarts",
+            "encrypted" : "true"
+        }
+    ],
+
+	"kvmEntries" : [
+        {
+    	    "name": "X-DATA-MANAGER-KEY",
+    	    "value": "",
+    	    "mapName": "DATA-MANAGER-API-KEY"
+    	},
+        {
+            "name" : "datastore-client-id",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        },
+        {
+            "name" : "datastore-client-secret",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        },
+        {
+            "name" : "datastore-client-token",
+            "value" : "",
+    	    "mapName": "streetcarts"
+        }
+    ],
+
+	"groups" : [
+	    {
+	        "title":"Foodcart Owners",
+	        "path": "owners",
+	        "roles": [
+	            { "name": "owners" }
+	        ],
+	        "permissions": [
+	            {
+	                "verbs": "",
+	                "path": ""
+	            }
+	        ]
+	    },
+	    {
+	        "title":"Members",
+	        "path": "members",
+	        "roles": [
+	            { "name": "default" }
+	        ],
+	        "permissions": [
+	            {
+	                "verbs": "",
+	                "path": ""
+	            }
+	        ]
+	    }
+	],
+
+	"roles" : [
+	    {
+	        "title": "Foodcart Owners",
+	        "name": "owners",
+	        "permissions": [
+	            {
+	                "path": "/foodcarts/*",
+	                "verbs":"post"
+	            },
+	            {
+	                "path": "/foodcarts",
+	                "verbs":"post"
+	            }
+	        ]
+	    },
+	    {
+	        "title": "Default",
+	        "name": "default",
+	        "permissions": [
+	            {
+	                "path": "/groups/owners/users/*",
+	                "verbs":"post,put"
+	            },
+	            {
+	                "path": "/reviews/*",
+	                "verbs":"post,put"
+	            }
+	        ]
+	    },
+	    {
+	        "title": "Guest",
+	        "name": "guest",
+	        "permissions": [
+	            {
+	                "path":"/foodcarts",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/foodcarts/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/foodcarts/*/offers/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/foodcarts/*/publishes/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/items",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/items/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/menus",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/menus/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path":"/menus/*/includes/*",
+	                "verbs": "get"
+	            },
+	            {
+	                "path": "/reviews/*",
+	                "verbs":"get"
+	            },
+	            {
+	                "path":"/devices",
+	                "verbs": "post"
+	            },
+	            {
+	                "path":"/groups/*/users/*",
+	                "verbs": "post"
+	            },
+	            {
+	                "path":"/users",
+	                "verbs": "post"
+	            },
+	            {
+	                "path":"/users/*",
+	                "verbs": "post"
+	            },
+	            {
+	                "path":"/devices/*",
+	                "verbs": "put"
+	            }
+	        ]
+	    }
+	]
+
+}

@@ -2,15 +2,13 @@ var request = require('request');
 var async = require('async');
 var apigee = require('apigee-access'); 
 
-var host = 'BAASAPIREPLACE';
-var appPath = '/BAASORGREPLACE/BAASAPPREPLACE';
+var host = '@@BAASAPIREPLACE';
+var appPath = '/@@BAASORGREPLACE/@@BAASAPPREPLACE';
 
-// Name and scope for the Edge vault containing 
-// API BaaS credentials.
-var edgeVault = 'streetcarts';
-var edgeVaultScope = 'environment';
+// Name of the Edge key-value map containing API BaaS credentials.
+var edgeKVM = 'streetcarts';
 
-// Names of vault entries whose values are API BaaS
+// Names of KVM entries whose values are API BaaS
 // client ID and secret. Thesee should have been created
 // as part of app configuration.
 var dataStoreIdEntry = 'datastore-client-id';
@@ -157,7 +155,7 @@ module.exports = {
     /**
      * Get a single foodcart using the cart's UUID.
      */
-     getCart: function (cartUUID, callback) {
+    getCart: function (cartUUID, callback) {
         
         endpointPath = "/foodcarts/" + cartUUID;
         var uri = host + appPath + endpointPath;
@@ -448,7 +446,7 @@ module.exports = {
         var menuData = args.newValues;
         var baasToken = args.baasToken;
         menuData.cartID = cartUUID;
-        var tokenParam = "?access_token=" + baasToken
+        var tokenParam = "?access_token=" + baasToken;
         
         endpointPath = "/foodcarts/" + cartUUID + "/publishes/menus" + tokenParam;        
         var uri = host + appPath + endpointPath;
@@ -626,7 +624,7 @@ module.exports = {
 
         var tokenParam = "?access_token=" + args.baasToken;
         endpointPath = "/menus/" + args.menuUUID + 
-            "/includes/items/" + args.itemUUID + tokenParam;
+            "/includes/" + args.itemUUID + tokenParam;
         
         var uri = host + appPath + endpointPath;
         
@@ -1409,7 +1407,7 @@ module.exports = {
                 var entity = JSON.parse(response);
                 getGroupsForUser(entity.user.uuid, function(error, groupList) {
                     if (error) {
-                        console.log('groups auth error: ' + JSON.stringify(error)); 
+                        console.log('Groups auth error: ' + JSON.stringify(error)); 
                         callback(error, null);
                     } else {
                         entity.user.user_groups = groupList;                        
@@ -1497,8 +1495,8 @@ function getGroupsForUser (userUUID, callback) {
 
     getDataStoreClientToken( function(error, dataStoreClientToken) {
 
-        if (error) {
-            console.log(error);
+        if (error) {            
+            console.log('\nError while getting groups for user: ' + error.message);
             callback(error, null);
         } else {
         
@@ -1512,7 +1510,6 @@ function getGroupsForUser (userUUID, callback) {
                 uri: uri,
                 method: "GET"
             };
-        
             return makeRequest(options, function (error, response) {
                 if (error) {
                     error.message = "Unable to get the list of groups for user ID:" +
@@ -1535,9 +1532,9 @@ function getGroupsForUser (userUUID, callback) {
                         callback(error, null);
                     }            
                 }
-            });            
+            });
         }
-    });    
+    });
 }
 
 /**
@@ -1662,30 +1659,7 @@ function secureCartOwnerUserGroup (cartUUID, groupPath, callback) {
                 if (error) {
                     callback(error, null);
                 } else {
-                
-                    // Create the menu manager role that will include
-                    // permissions granting access to create, update, and 
-                    // delete menu items and menus for this foodcart.
-                    createMenuManagerRole(cartUUID, 
-                        function(error, menuManagerResponse) {
-                        if (error) {
-                            callback(error, null);
-                        } else {
-                        
-                            // Assign the new menu manager role to the 
-                            // foodcart's "owners" group.
-                            managerRoleName = menuManagerResponse.name;
-                            var menuManagerRoleName = menuManagerResponse.name;
-                            assignRoleToGroup(menuManagerRoleName, groupPath, 
-                                function(error, response) {
-                                if (error) {
-                                    callback(error, null);
-                                } else {
-                                    callback(null, response);                                        
-                                }
-                            });
-                        }                
-                    });                                            
+					callback(null, response);
                 }
             });
         }                
@@ -1832,7 +1806,6 @@ function deleteCartManagerRole (cartUUID, callback) {
         }
     });
 }
-
 
 /**
  * Creates an "owners" API BaaS user group for the specified foodcart.
@@ -2268,7 +2241,7 @@ function addUserToGroup (userUUID, groupPath, callback) {
     });
 }
 
-// General utility functions.
+// Utility functions.
 
 /**
  * Makes a request to the API BaaS data store API. All requests
@@ -2301,66 +2274,65 @@ function makeRequest(options, callback) {
 }
 
 /**
- * Authenticates with the API BaaS data store using the 
- * BaaS organization client ID and secret. This level
- * of authorization grants full access to BaaS features.
+ * Gets an "application client" API BaaS auth token
+ * for use in performing certain operations with the 
+ * data store, including changes to user groups, roles,
+ * and permissions.
  * 
- * This function is called from multiple places, wherever
- * other code needs to authenticate with API BaaS as 
- * "application client."
+ * This function is designed to get a token from API Baas
+ * by authenticating with API BaaS. For credentials, this 
+ * function uses values stored (during deploy) in an Edge
+ * key/value map.
  */
-function authenticateAsDataStoreClient(callback) {
-
-    // Use apigee-access to get a reference to the vault, where 
-    // API BaaS credentials are stored.
-    var orgVault = apigee.getVault(edgeVault, edgeVaultScope);
+function getDataStoreClientToken(callback){
+    var kvm = apigee.getKeyValueMap('streetcarts', 'environment');
     
-    // Get the vault entry value whose key is "datastore-client-id". 
-    // This is the API BaaS client ID.
-    orgVault.get(dataStoreIdEntry, function(error, idValue) {
-        var clientID;
-        var clientSecret;
-        
-        if (error) {
-            callback(error);
+    kvm.get(dataStoreIdEntry, function(error, keyValue){
+        if (error){
+            console.log('\nError while getting BaaS client ID: ' + 
+                JSON.stringify(error));
+            callback(error, null);
         } else {
-            clientID = idValue;
-            // If the client ID came back, get the value for the
-            // "datastore-client-secret" vault entry. This is the 
-            // API BaaS client secret.
-            orgVault.get(dataStoreSecretEntry, function(error, secretValue) {
-                if (error) {
+            var clientID = keyValue;
+            
+            kvm.get(dataStoreSecretEntry, function(error, keyValue){
+                if (error){
+                    console.log('\nError while getting BaaS client secret: ' + 
+                        JSON.stringify(error));
                     callback(error, null);
-                } else {                
-                    clientSecret = secretValue;
+                } else {
+                    var clientSecret = keyValue;
                     
                     // With the client ID and secret in hand, authenticate
                     // with them and get back a token for future requests.
-                    
+    
                     endpointPath = "/token";
                     var uri = host + appPath + endpointPath;
-                
+
                     console.log("Authenticating as a data store client: " +
                         uri);
-                
+                    console.log('\nClient ID and secret: ' + clientID + 
+                        ':' + clientSecret);
+                    // console.log('\nClient secret value: ' + clientSecret)
+
                     var authBody = {
                         "grant_type" : "client_credentials",
                         "client_id" : clientID, 
                         "client_secret" : clientSecret
                     };
-                
+
                     var options = {
                         uri: uri,
                         body: JSON.stringify(authBody),
                         method: "POST"
                     };
-                    
+                    console.log('/nAuthenticating as data store client: ' + JSON.stringify(options));
                     return makeRequest(options, function (error, response) {
                         if (error) {
                             error.message = "Unable to authenticate as client.";
                             callback(error, null);
                         } else {
-                        
+        
                             // Call back with the OAuth token representing
                             // StreetCarts as an application client.
                             var clientToken = JSON.parse(response).access_token;
@@ -2369,49 +2341,8 @@ function authenticateAsDataStoreClient(callback) {
                         }
                     });
                 }
-            });            
-        }
-    });    
-}
-
-/**
- * Gets an "application client" API BaaS auth token
- * for use in performing certain operations with the 
- * data store, including changes to user groups, roles,
- * and permissions.
- * 
- * This function is designed to get a token from the Edge
- * vault (secure store) and if there is no token there, 
- * it gets one by authenticating with BaaS. When authenticating,
- * the function uses the BaaS organization client ID and
- * secret, which were stored in the vault as a step in 
- * setting up StreetCarts. 
- * 
- * However, there currently appears to be no way to refresh
- * a vault entry using the apigee-access Node.js module (after 
- * a token is retrieved by authenticating), so this code just 
- * generates a token on each call.
- */
-function getDataStoreClientToken(callback) {
-
-    var orgVault = apigee.getVault(edgeVault, edgeVaultScope);
-
-    orgVault.get(dataStoreTokenEntry, function(error, clientToken) {
-        if (error) {
-            callback(error);
-        } else {
-            if (clientToken === '')
-            {
-                authenticateAsDataStoreClient( function(error, authToken) {
-                    if (error) {
-                        callback(error, null);
-                    } else {
-                        clientToken = authToken;
-                        callback(null, clientToken);
-                    }
-                });
-            }    
-        }
+            });
+        }        
     });
 }
 

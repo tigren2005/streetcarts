@@ -7,7 +7,6 @@ This directory contains data and scripts for configuring and seeding the StreetC
 
 To set up integration between the StreetCarts proxies and the API BaaS backend data store, you'll need to configure a couple of things. You'll need to:
 
-* **Add a vault and vault entries** to the Edge environment. StreetCarts uses these entries to hold values for authenticating with API BaaS.
 * **Add user groups, roles, and permissions** to API BaaS. These are needed to provide initial role-based security.
 
 ### Prerequisites
@@ -21,7 +20,7 @@ Before you configure the app, you should have first:
 
 ### Set configuration options
 
-The configuration scripts read a config file at `streetcarts/proxies/src/gateway/bin/seed/bootstrap-config.json` for information about the application. Edit this file, replacing the placeholder values the keys described in the following table:
+The configuration scripts read a config file at `streetcarts/proxies/src/gateway/bin/seed/streetcarts-config.json` for information about the application. Edit this file, replacing the placeholder values the keys described in the following table:
 
 | Key | Description |
 | --- | --- |
@@ -36,44 +35,9 @@ The configuration scripts read a config file at `streetcarts/proxies/src/gateway
 | datastore-client-secret | Client secret from API BaaS org where StreetCarts data will be hosted. |
 | API BaaS orgName | Name of the API BaaS org where StreetCarts data will be hosted. |
 | API BaaS appName | Name of the API BaaS app where StreetCarts data will be hosted. |
-| API BaaS apiHost | Host for access to the API BaaS API, such as `api.usergrid.com` |
+| API BaaS apiHost | Host for access to the API BaaS API, such as `apibaas-trial.apigee.net` |
 | API BaaS clientId | Client ID from the API BaaS org where StreetCarts data will be hosted.  |
 | API BaaS clientSecret | Client secret from the API BaaS org where StreetCarts data will be hosted. |
-
-<a name="vault" />
-### Configure a streetcarts vault
-
-StreetCarts uses [application client](http://docs.apigee.com/app-services/content/user-authentication-types#adminauthenticationlevels) credentials to make permissions changes in API BaaS. It stores these credentials in the secure Edge vault because they grant full access to the API BaaS data store.
-
-Before running StreetCarts, you'll need to set up an Edge vault and vault entries for these credentials. You can do this either with the included script or by using the Edge management API manually.
-
-#### Adding a vault with the config script
-
-2. **Add the vault and vault entries** StreetCarts will need for some requests to API BaaS by running the following command in the `seed` directory. This script uses the Edge management API, so requires your Edge credentials.
-
- > Note: This is an alternative to the manual process (described below) using the Edge management API.
-
- ```
-node streetcarts-config-seed configure-edge /path/to/streetcarts-config.json
-```
-
-#### Adding a vault with the management API
-
-1. Go to the API BaaS admin console and note the client ID and client secret for the application's organization. These should be on the Org Administration page.
-2. Use the Edge management API to [add a vault](http://docs.apigee.com/management/apis/post/organizations/%7Borg_name%7D/environments/%7Benv_name%7D/vaults) and [add vault entries](http://docs.apigee.com/management/apis/post/organizations/%7Borg_name%7D/environments/%7Benv_name%7D/vaults/%7Bvault_name_in_env%7D/entries), as listed in the following table:
-
- | Vault Name | Scope | Entry | Value |
- | --- | --- | --- | --- | --- |
- | streetcarts | environment | datastore-client-id | \<API BaaS client ID> |
- | streetcarts | environment | datastore-client-secret | \<API BaaS client secret> |
- | streetcarts | environment | datastore-client-token | None. |
- 
- For example, to create a vault called "streetcarts" in the test environment of myorg, you could use the following endpoint and JSON body:
- 
- Endpoint: `POST https://api.enterprise.apigee.com/v1/organizations/myorg/environments/test/vaults`
- 
- 
- Body: `{"name":"streetcarts"}`
 
 ### Configure API BaaS with user groups, roles, and permissions
 

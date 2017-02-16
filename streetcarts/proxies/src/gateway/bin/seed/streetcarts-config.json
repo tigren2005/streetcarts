@@ -1,52 +1,5 @@
 {
-    "edge": {
-        "mgmtApiHost": "HOST FOR ACCESS TO EDGE MANAGEMENT API -- SUCH AS api.enterprise.apigee.com",
-        "appApiHost": "HOST FOR ACCESS TO STREETCARTS API -- SUCH AS apigee.net",
-        "orgName": "NAME OF EDGE APP WHERE STREETCARTS IS DEPLOYED",
-        "envName": "NAME OF EDGE ENVIRONMENT WHERE STREETSCARTS IS DEPLOYED -- SUCH AS prod OR test",
-        "appName": "streetcarts",
-        "apiVersion": "v1",
-        "clientCredentials": [
-            {
-                "devAppName": "SC-APP-TRIAL",
-                "consumerKey": "CONSUMER KEY FROM STREETCARTS SC-APP-TRIAL",
-                "consumerSecret": "CONSUMER SECRET FROM STREETCARTS SC-APP-TRIAL"
-            },
-            {
-                "devAppName": "SC-APP-UNLIMITED",
-                "consumerKey": "CONSUMER KEY FROM STREETCARTS SC-APP-UNLIMITED",
-                "consumerSecret": "CONSUMER SECRET FROM STREETCARTS SC-APP-UNLIMITED"
-            }
-        ],
-        "vaults": [
-            {
-                "name": "streetcarts",
-                "scope": "environment",
-                "entries" :[
-                    {
-                        "name": "datastore-client-id",
-                        "value": "CLIENT ID FROM API BAAS ORG WHERE STREETCARTS DATA WILL BE HOSTED"
-                    },
-                    {
-                        "name": "datastore-client-secret",
-                        "value": "CLIENT SECRET FROM API BAAS ORG WHERE STREETCARTS DATA WILL BE HOSTED"
-                    },
-                    {
-                        "name": "datastore-client-token",
-                        "value": ""
-                    }
-                ]
-            }
-        ]
-    },
     "apiBaaS": {
-        "orgName": "NAME OF API BAAS ORG WHERE STREETCARTS DATA WILL BE HOSTED",
-        "appName": "NAME OF API BAAS APP WHERE STREETCARTS DATA WILL BE HOSTED",
-        "apiHost": "HOST FOR ACCESS TO API BAAS API -- SUCH AS api.usergrid.com", 
-        "clientCredentials": {
-            "clientId": "CLIENT ID FROM API BAAS ORG WHERE STREETCARTS DATA WILL BE HOSTED",
-            "clientSecret": "CLIENT SECRET FROM API BAAS ORG WHERE STREETCARTS DATA WILL BE HOSTED"            
-        },
         "roles": [
             {
                 "title": "Foodcart Owners",

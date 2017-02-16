@@ -12,10 +12,17 @@
   "dependencies": {
     "apigeetool": "mukundha/apigeetool-node",
     "async": "*",
+    "body-parser": "^1.16.0",
+    "del": "^2.2.2",
     "gulp": "*",
+    "gulp-build": "^0.5.3",
     "gulp-util": "^3.0.7",
+    "json-query": "2.2.0",
     "q": "*",
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "require-dir": "0.3.1",
+    "run-sequence": "1.2.2",
+    "sleep": "^3.0.1"
   },
   "author": "straut@google.com",
   "license": "ISC"

@@ -4,20 +4,16 @@
  * interacts with the data store. 
  */
 
-
 var dataManager = require('./data-manager');
 var express = require('express');
-var cors = require('cors');
 var app = express();
 var apigee = require('apigee-access'); 
-
 var bodyParser = require('body-parser');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(cors());
-
 
 // foodcarts proxy paths //
 

@@ -11,7 +11,7 @@ function createApp(app){
     opts.apiProducts = app.apiProducts
     opts.email = app.email
     opts.callback = app.callback
-    
+    console.log('\nCreating app: ' + app.name)    
     sdk.createApp(opts)
     .then(function(appresponse){
         defer.resolve(appresponse)
@@ -28,6 +28,7 @@ function createApps(app,cb){
     opts.apiProducts = app.apiProducts
     opts.email = app.email
     opts.callback = app.callback
+    console.log('\nCreating app: ' + app.name)
     cb(null,sdk.createApp(opts))
 }
 
@@ -36,6 +37,7 @@ function deleteApps(app,cb){
     var opts=baseopts()
     opts.name=app.name
     opts.email = app.email
+    console.log('\nDeleting app: ' + app.name)
     cb(null,sdk.deleteApp(opts))
 }
 
@@ -43,32 +45,40 @@ function deleteProducts(prod,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.productName = prod.name,
+    console.log('\nDeleting product: ' + prod.name)
     cb(null,sdk.deleteProduct(opts))
 }
 
 function createProducts (prod,cb) {
     var sdk = apigeetool.getPromiseSDK()
-   var opts = baseopts()
+    var opts = baseopts()
     prod.productName = prod.name,
         opts.productDesc = prod.displayName
-        var proxies = ''
-        for(var p in prod.proxies) proxies += prod.proxies[p] +','
-        opts.proxies = proxies
-        var env = ''
-        for(var e in prod.environments) env += prod.environments[e] + ','
-        opts.environments = env
-        var scopes = ''
-        for(var s in prod.scopes) scopes += prod.scopes[s] + ','
-        opts.scopes =s 
-        opts.productName = prod.name        
-        cb(null,sdk.createProduct(opts))
+    var proxies = ''
+    for(var p in prod.proxies) proxies += prod.proxies[p] + ','
+    opts.proxies = proxies
+    var apiResources = ''
+    for(var r in prod.apiResources) apiResources += prod.apiResources[r] + ','
+    opts.apiResources = apiResources 
+    var env = ''
+    for(var e in prod.environments) env += prod.environments[e] + ','
+    opts.environments = env
+    var scopes = ''
+    for(var s in prod.scopes) scopes += prod.scopes[s] + ','
+    opts.scopes = scopes 
+	opts.quota = prod.quota
+	opts.quotaInterval = prod.quotaInterval
+	opts.quotaTimeUnit = prod.quotaTimeUnit
+    opts.productName = prod.name        
+    console.log('\nCreating product: ' + prod.name)
+    cb(null,sdk.createProduct(opts))
 }
 
 function createDevelopers (dev,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     for(k in dev) opts[k]=dev[k]
-    console.log(opts)
+    console.log('\nCreating developer: ' + dev.email)
     cb(null,sdk.createDeveloper(opts))
 }
 
@@ -76,6 +86,7 @@ function deleteDevelopers (dev,cb) {
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.email = dev.email
+    console.log('\nDeleting developer: ' + dev.email)
     cb(null,sdk.deleteDeveloper(opts))
 }
 
@@ -84,21 +95,31 @@ function deleteApis(it,cb){
         var opts = baseopts()
         opts.directory = it.dir
         opts.api = it.proxy
-        console.log('undeploying ' + opts.api)
         sdk.undeploy(opts)
         .then(function(){
-            console.log('undeployed ' + opts.api)
+            // console.log('Undeployed ' + opts.api)
             return sdk.delete(opts)
         },function(err){
             console.log(err)
             return sdk.delete(opts)
         })
         .then(function(){
-            console.log('deleted ' + opts.api)
+            console.log('\nDeleting API: ' + opts.api)
             cb(null, 'done')
         },function(err){
-            console.log('delete failed ' + opts.api)
-            cb(err)
+            console.log('Delete failed ' + err.message)
+            console.log('Delete failed ' + opts.api)
+			// Ignore the "does not exist" message because
+			// we want to keep deleting even if one of the 
+			// proxies has been deleted by the user.
+			if (err.message.includes('does not exist'))
+			{
+				console.log(err)
+				cb(null)
+			} else {
+				console.log(err)
+	            cb(err)				
+			}
         })            
 }
 
@@ -107,6 +128,7 @@ function deployApis(it,cb) {
     var opts = baseopts()
     opts.directory = it.dir
     opts.api = it.proxy
+    console.log('\nDeploying API: ' + opts.api)
     cb(null, sdk.deployProxy(opts))
 }
 
@@ -114,31 +136,31 @@ function createCaches(c,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
     opts.cache = c.name
+    console.log('\nCreating cache ' + c.name)
     cb(null,sdk.createcache(opts))
 }
 
 function deleteCaches(c,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('deleting cache ' + c.name)
     opts.cache = c.name
-    console.log(opts)
+    console.log('\nDeleting cache ' + c.name)
     cb(null,sdk.deletecache(opts))    
 }
 
 function createKVMs(kvm,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    opts.mapName = kvm.name    
+    opts.mapName = kvm.name
+    console.log('\nCreating KVM: ' + kvm.name)
     cb(null,sdk.createKVM(opts))
 }
 
 function deleteKVMs(kvm,cb){
     var sdk = apigeetool.getPromiseSDK()
     var opts = baseopts()
-    console.log('deleting KVM ' + kvm.name)
+    console.log('\nDeleting KVM: ' + kvm.name)
     opts.mapName = kvm.name
-    console.log(opts)
     cb(null,sdk.deleteKVM(opts))
 }
 
@@ -148,17 +170,9 @@ function createKVMEntries(entry,cb){
     opts.mapName = entry.mapName
     opts.entryName = entry.name
     opts.entryValue = entry.value
+    console.log('\nCreating KVM entry: ' + entry.name + ' in ' + entry.mapName)
     cb(null,sdk.addEntryToKVM(opts))
 }
-
-//function deleteKVMEntries(entry,cb){
-//    var sdk = apigeetool.getPromiseSDK()
-//    var opts = baseopts()
-//    console.log('deleting KVM ' + kvm.name)
-//    opts.mapName = entry.name
-//    console.log(opts)
-//    cb(null,sdk.deleteKVM(opts))
-//}
 
 function run(arr, func){ 
     var defer=q.defer();
@@ -166,12 +180,12 @@ function run(arr, func){
         func(c,cb)
     },function(err,results){
         if(err){
-            console.log(err)
+            console.log('run error' + err)
             defer.reject(err)
         }
         q.all(results)
             .then(function(){
-                console.log('done')
+                // console.log('done')
                 defer.resolve()
             },function(err){
                 console.log(err)
@@ -181,14 +195,13 @@ function run(arr, func){
     return defer.promise
 }
 
-
 function baseopts () {
     var opts = {
         organization: gutil.env.org,
         token: gutil.env.token,
         environments: gutil.env.env,    
         environment: gutil.env.env,
-        debug: gutil.env.debug ,
+        debug: gutil.env.debug,
         usergrid_org: gutil.env.ug_org,   
         usergrid_app: gutil.env.ug_app,
         usergrid_client_id: gutil.env.ug_client_id,
