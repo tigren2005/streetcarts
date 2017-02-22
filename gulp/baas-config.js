@@ -60,11 +60,11 @@ function createConfigGroups(groups) {
         },
         function (error) {
             if (error) {
-                console.log("Could not create groups: " + 
+                console.log('\nCould not create groups: ' + 
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Created API BaaS groups.");
+                console.log('\nCreated API BaaS groups.');
 				defer.resolve();
             }
         });
@@ -103,11 +103,11 @@ function deleteConfigGroups(groups) {
         },
         function (error) {
             if (error) {
-                console.log("Could not delete config groups: " + 
+                console.log('\nCould not delete config groups: ' + 
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Deleted API BaaS config groups.");
+                console.log('\nDeleted API BaaS config groups.');
 				defer.resolve();
             }
         });
@@ -183,7 +183,7 @@ function createConfigRoles(roles) {
                         var path = permission.path;
                         
                         var permissionsBody = { 
-                            "permission" : verbs + ':' + path
+                            permission : verbs + ':' + path
                         };
                         
                         var options = {
@@ -221,11 +221,11 @@ function createConfigRoles(roles) {
     },
     function (error) {
         if (error) {
-            console.log("Could not create roles: " + 
+            console.log('\nCould not create roles: ' + 
                 error.message);
 			defer.reject(error);
         } else {
-            console.log("Created API BaaS roles.");
+            console.log('\nCreated API BaaS roles.');
             defer.resolve();
         }
     });
@@ -264,11 +264,11 @@ function deleteConfigRoles(roles) {
         },
         function (error) {
             if (error) {
-                console.log("Could not delete groups: " + 
+                console.log('\nCould not delete groups: ' + 
                     error.message);
 				defer.reject(error);
             } else {
-                console.log("Deleted API BaaS groups.");
+                console.log('\nDeleted API BaaS groups.');
                 defer.resolve();
             }
         });
@@ -331,11 +331,11 @@ function assignRolesToGroups(groups) {
     },
     function (error) {
         if (error) {
-            console.log("Could not assign API BaaS roles: " + 
+            console.log('\nCould not assign API BaaS roles: ' + 
                 error.message);
 			defer.reject(error)
         } else {
-            console.log("Assigned API BaaS roles to groups.");
+            console.log('\nAssigned API BaaS roles to groups.');
 			defer.resolve();
         }
     });
@@ -433,8 +433,8 @@ function makeRequest(options, callback) {
             callback(errorObject, null);
         } else {            
             // console.log('\nRequest: ' + options.method + ' ' + options.uri);
-            // console.log('Status code: ' + response.statusCode);
-            // console.log('Response body: ' + response.body);
+            // console.log('\nStatus code: ' + response.statusCode);
+            // console.log('\nResponse body: ' + response.body);
             
             if (response.body) {
                 var callbackResponse;

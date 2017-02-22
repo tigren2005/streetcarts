@@ -186,10 +186,10 @@ gulp.task('build',function(callback){
 // Run the other tasks that clean and deploy.
 gulp.task('deploy', function(callback){
 	// Gulp runs dependencies in parallel. Make sure these are run sequentially.
-    runSequence('clean-build', 'build', 'init-config', 'deploy-app',
-            'configure-baas', callback);
     // runSequence('clean-build', 'build', 'init-config', 'deploy-app',
-    //         'configure-baas', 'seed-streetcarts', callback);
+    //         'configure-baas', callback);
+    runSequence('clean-build', 'build', 'init-config', 'deploy-app',
+            'configure-baas', 'seed-streetcarts', callback);
 });
 
 // Set up the Edge pieces. Import proxies, products, developer, 
@@ -307,11 +307,22 @@ gulp.task('deploy-app', function(callback) {
         })
 	.then(
         function () {
+            console.log('\nRedeploying the data-manager proxy.');
+            return edgeConfig.redeployProxy('data-manager');
+        },
+        function (error) {
+            console.log('\nUnable to install Node.js modules. ' +
+                'Moving on to redeploy the data-manager proxy.\n' +
+                error);
+			return edgeConfig.redeployProxy('data-manager');
+        })
+        .then(
+        function () {
             console.log('\nInstalled Node modules.');
             console.log('\nAll done deploying to Edge.');
         },
         function (error) {
-            console.log('\nUnable to install Node modules.\n: ' +
+            console.log('\nUnable to redeploy data-manager proxy\n: ' +
                 error);
         }
     )	

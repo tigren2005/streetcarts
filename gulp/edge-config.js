@@ -3,8 +3,7 @@ var async = require('async');
 var gutil = require('gulp-util');
 var request = require('request');
 var sleep = require('sleep');
-
-// curl -v -X POST --header "Content-Type: application/x-www-form-urlencoded" -u $username:$password -d "command=install" "$env/v1/organizations/$org/apis/data-manager/revisions/$rev/npm"
+var util = require('util');
 
 function installNodeModules() {
 	
@@ -30,12 +29,66 @@ function installNodeModules() {
 
     makeRequest(options, function (error, response) {
         if (error) {
-            console.log("Could not install node modules: " + 
+            console.log('\nCould not install node modules: ' + 
                 error.message);
 			defer.reject(error);
         } else {
-            console.log("Installed node modules.");
 			defer.resolve(response);
+        }
+    });
+    return defer.promise;
+}
+
+function redeployProxy(proxyName) {
+
+	var opts = baseopts();
+	var defer = q.defer();
+	
+    var host = opts.host;
+    var org = opts.organization;
+    var env = opts.environment;
+    var rev = '1';
+    
+	var uri = util.format('%s/v1/o/%s/e/%s/apis/%s/revisions/%s/deployments', host, org, 
+        env, proxyName, rev);
+        
+    var options = {
+        uri: uri,
+        auth: {
+            'bearer': opts.token
+        },
+        method: "DELETE"
+    };
+
+    makeRequest(options, function (error, response) {
+        if (error) {
+            console.log('\nCould not undeploy proxy: ' + proxyName + 
+                '\n' + error.message);
+			defer.reject(error);
+        } else {
+            console.log('\nUndeployed proxy: ' + proxyName);
+            
+        	var uri = util.format('%s/v1/o/%s/e/%s/apis/%s/revisions/%s/deployments?override=true', 
+                host, org, env, proxyName, rev);
+        
+            var options = {
+                uri: uri,
+                auth: {
+                    'bearer': opts.token
+                },
+                method: "POST"
+            };
+
+            makeRequest(options, function (error, response) {
+                if (error) {
+                    console.log('\nCould not deploy proxy: ' + proxyName + 
+                        '\n' + error.message);
+        			defer.reject(error);
+                } else {
+                    console.log('\nDeployed proxy: ' + proxyName);            
+        			defer.resolve(response);
+                }
+            });            
         }
     });
     return defer.promise;
@@ -78,7 +131,7 @@ function getAppKeyAndSecret(app, callback){
                 error);
                 callback(error, null);
         } else {
-            console.log("\nGot consumer key and secret");
+            console.log('\nGot consumer key and secret');
             keySecret.consumerKey =
                 response.credentials[0].consumerKey;
             keySecret.consumerSecret = 
@@ -107,7 +160,7 @@ function baseopts () {
 
 function makeRequest(options, callback) {
     
-    sleep.sleep(1);
+    // sleep.sleep(1);
     
     request(options, function (error, response) {
         var errorObject = new Error();
@@ -141,6 +194,7 @@ function makeRequest(options, callback) {
 
 module.exports = {
     installNodeModules: installNodeModules,
-	getAppKeyAndSecret: getAppKeyAndSecret
+	getAppKeyAndSecret: getAppKeyAndSecret,
+    redeployProxy: redeployProxy
 }
 

@@ -10,7 +10,7 @@
     "test": "mocha "
   },
   "dependencies": {
-    "apigeetool": "mukundha/apigeetool-node",
+    "apigeetool": "stevetraut/apigeetool-node",
     "async": "*",
     "body-parser": "^1.16.0",
     "del": "^2.2.2",
