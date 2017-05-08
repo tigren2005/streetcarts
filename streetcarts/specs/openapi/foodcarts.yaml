@@ -4,7 +4,7 @@ info:
   description: Manage food carts.
   title: Food Carts API
 basePath: /v1/streetcarts
-host: llynch-test.apigee.net
+host: org_name-env.apigee.net
 schemes:
   - https
 securityDefinitions:
