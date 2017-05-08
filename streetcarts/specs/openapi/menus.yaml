@@ -6,8 +6,16 @@ info:
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
-  - http
   - https
+securityDefinitions:
+   APIKeyHeader:
+     type: apiKey
+     in: header
+     name: x-api-key
+   Bearer:
+     type: apiKey
+     in: header
+     name: Authorization
 consumes:
   - application/json
 produces:
@@ -17,6 +25,8 @@ paths:
     get:
       description: View details for a menu.
       operationId: Get Menu by ID
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: menu_id
           in: path
@@ -31,6 +41,8 @@ paths:
     delete:
       description: Delete a menu.
       operationId: Delete Menu
+      security:
+        - Bearer: []
       parameters:
         - name: menu_id
           in: path
@@ -46,6 +58,8 @@ paths:
     get:
       description: View all items on a menu.
       operationId: Get Items on Menu
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: menu_id
           in: path
@@ -61,6 +75,8 @@ paths:
     put:
       description: Add an item to a menu.
       operationId: Add Item to Menu
+      security:
+        - Bearer: []
       parameters:
         - name: menu_id
           in: path
@@ -79,6 +95,8 @@ paths:
     delete:
       description: Remove an item from a menu.
       operationId: Remove Item from Menu
+      security:
+        - Bearer: []
       parameters:
         - name: menu_id
           in: path

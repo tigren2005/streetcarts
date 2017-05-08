@@ -4,10 +4,18 @@ info:
   description: Manage food carts.
   title: Food Carts API
 basePath: /v1/streetcarts
-host: org_name-env.apigee.net
+host: llynch-test.apigee.net
 schemes:
-  - http
   - https
+securityDefinitions:
+   APIKeyHeader:
+     type: apiKey
+     in: header
+     name: x-api-key
+   Bearer:
+     type: apiKey
+     in: header
+     name: Authorization
 consumes:
   - application/json
 produces:
@@ -17,6 +25,8 @@ paths:
     get:
       description: View all food carts.
       operationId: GetFoodCarts
+      security:
+        - APIKeyHeader: []
       responses:
         '200':
           description: Success
@@ -25,6 +35,8 @@ paths:
     post:
       description: Create a food cart.
       operationId: CreateFoodCart
+      security:
+        - Bearer: []
       parameters:
         - name: body
           in: body
@@ -41,6 +53,8 @@ paths:
     get:
       description: View food cart details.
       operationId: GetFoodCartbyID
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: cart_id
           in: path
@@ -55,6 +69,8 @@ paths:
     put:
       description: Update food cart details.
       operationId: UpdateFoodCart
+      security:
+        - Bearer: []
       parameters:
         - name: cart_id
           in: path
@@ -75,6 +91,8 @@ paths:
     delete:
       description: Delete a food cart.
       operationId: DeleteFoodCart
+      security:
+        - Bearer: []
       parameters:
         - name: cart_id
           in: path
@@ -90,6 +108,8 @@ paths:
     get:
       description: View the menus associated with a food cart.
       operationId: GetFoodCartMenus
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: cart_id
           in: path
@@ -104,6 +124,8 @@ paths:
     post:
       description: Add a menu to a food cart.
       operationId: CreateFoodCartMenu
+      security:
+        - Bearer: []
       parameters:
         - name: cart_id
           in: path
@@ -125,6 +147,8 @@ paths:
     get:
       description: View menu items associated with a food cart.
       operationId: GetFoodCartItems
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: cart_id
           in: path
@@ -139,6 +163,8 @@ paths:
     post:
       description: Create a menu item to a food cart.
       operationId: CreateFoodCartItem
+      security:
+        - Bearer: []
       parameters:
         - name: cart_id
           in: path

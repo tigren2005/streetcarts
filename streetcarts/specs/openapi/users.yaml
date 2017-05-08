@@ -5,8 +5,12 @@ info:
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
-  - http
   - https
+securityDefinitions:
+   APIKeyHeader:
+     type: apiKey
+     in: header
+     name: x-api-key
 consumes:
   - application/json
 produces:
@@ -16,6 +20,8 @@ paths:
     get:
       description: View all users.
       operationId: Get Users
+      security:
+        - APIKeyHeader: []
       responses:
         '200':
           description: Success
@@ -24,6 +30,8 @@ paths:
     post:
       description: Create a user.
       operationId: Create User
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: body
           in: body
@@ -40,6 +48,8 @@ paths:
     get:
       description: View details for a user.
       operationId: Get User By ID
+      security:
+        - APIKeyHeader: []
       parameters:
         - name: user_id
           in: path
