@@ -3,7 +3,7 @@ info:
   version: '1.0'
   title: Authenticate user API
 basePath: /v1/streetcarts
-host: apigee-docs-test.e2e.apigee.net
+host: org_name-env.apigee.net
 schemes:
   - https
 consumes:
