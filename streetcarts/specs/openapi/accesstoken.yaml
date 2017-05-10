@@ -1,0 +1,110 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: Authenticate user API
+basePath: /v1/streetcarts
+host: apigee-docs-test.e2e.apigee.net
+schemes:
+  - https
+consumes:
+  - application/x-www-form-urlencoded
+produces:
+  - application/json
+paths:
+  '/accesstoken':
+    post:
+      description: 'Authenticate user.'
+      operationId: authenticateUser
+      consumes:
+      - application/x-www-form-urlencoded
+      produces:
+      - application/json
+      parameters:
+        - name: username
+          in: formData
+          description: 'Username.'
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 'Password.'
+          required: true
+          type: string
+        - name: grant_type
+          in: formData
+          description: 'Grant type. Must be set to <code>password</code>.'
+          required: true
+          type: string
+          default: password
+        - name: Authorization
+          in: header
+          description: 'Encode the consumer key and consumer secret for the registered developer application and pass as <code>Basic <i>encoded-value</i></code>.'
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/access-token'
+definitions:
+  access-token:
+    properties:
+      access_token:
+        type: string
+        description: Access token that can be used to issue other API calls.
+      api_product_list: 
+        type: string
+        description: Aray of API product names for which this token is valid.
+      application_name:
+        type: string
+        description: Internal unique identifier for the developer application under which this token was generated.
+      client_id:
+        type: string
+        description: Consumer key for the registered developer application.
+      developer.email:
+        type: string
+        description: Email of the developer.
+      expires_in:
+        type: string
+        description: "Time that the access token expires. If set to 0, there is no expiration date."
+      issued-at:
+        type: string
+        description: Time the access token was issues in epoch format.
+      organization_name:
+        type: string
+        description: Organization name.
+      refresh_count:
+        type: string
+        description: Number of times the access token has been refreshed.
+      refresh_token:
+        type: string
+        description: Refresh token.
+      refresh_token_expires_in:
+        type: string
+        description: "Time that the access token expires. If set to 0, there is no expiration date."
+      refresh_token_issued_at:
+        type: string
+        description: Time the access token was issues in epoch format.
+      refresh_token_status: 
+        type: string
+        description: Status of the refresh token.
+      scope:
+        type: string
+        description: OAuth scopes granted for the user this token represents.
+      status: 
+        type: string
+        description: Status of the request.
+      token_type:
+        type: string
+        description: Token type (BearerToken).
+      USER_BAAS_TOKEN: 
+        type: string
+        description: Authorization token received from the backend data store. For internal use by StreetCarts.
+      USER_UUID: 
+        type: string
+        description: Unique ID in the data store for the user this token represents. For internal use by StreetCarts.
