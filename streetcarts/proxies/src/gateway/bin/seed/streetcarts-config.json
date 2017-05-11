@@ -26,6 +26,14 @@
                     {
                         "path": "/reviews/*",
                         "verbs":"post,put"
+                    },
+                    {
+                        "path": "/users",
+                        "verbs":"get"
+                    },
+                    {
+                        "path": "/users/*",
+                        "verbs":"get"
                     }
                 ]
             },
