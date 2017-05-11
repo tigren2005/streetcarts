@@ -1,6 +1,7 @@
 swagger: '2.0'
 info:
   version: '1.0'
+  description: Manage food cart users.
   title: Users API
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
@@ -9,10 +10,16 @@ schemes:
 paths:
   '/users':
     get:
-      description: View all users.
+      description: 'View all users. <b>Note</b>: This method is not yet supported; the required permissions are not configured.'
       operationId: Get Users
       produces:
         - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -32,6 +39,11 @@ paths:
           description: Updates for the menu item.
           schema:
             $ref: '#/definitions/userDetails'
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -39,7 +51,7 @@ paths:
             $ref: '#/definitions/user'
   '/users/{user_id}':
     get:
-      description: View details for a user.
+      description: 'View details for a user. <b>Note</b>: This method is not yet supported.'
       operationId: Get User By ID
       produces:
         - application/json
@@ -47,6 +59,11 @@ paths:
         - name: user_id
           in: path
           description: ID of the user.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
       responses:
@@ -91,7 +108,16 @@ definitions:
     type: array
     description: List of users.
     items:
-      $ref: '#/definitions/userDetails'
+      properties:
+        email:
+          type: string
+          description: User email.
+        username:
+          type: string
+          description: Username.
+        uuid:
+          type: string
+          description: ID of the user.
   user:
     description: User details.
     properties:
@@ -122,10 +148,10 @@ definitions:
       region:
         type: string
         description: Region or state where user resides.
-      uuid:
-        type: string
-        description: ID of the user.
       username:
         type: string
         description: Username.
+      uuid:
+        type: string
+        description: ID of the user.
 
