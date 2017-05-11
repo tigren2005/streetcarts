@@ -7,30 +7,22 @@ basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
   - https
-securityDefinitions:
-   APIKeyHeader:
-     type: apiKey
-     in: header
-     name: x-api-key
-   Bearer:
-     type: apiKey
-     in: header
-     name: Authorization
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   '/items/{item_id}':
     get:
       description: View details for a menu item.
       operationId: Get Menu Item By ID
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -41,12 +33,19 @@ paths:
     put:
       description: Update a menu item.
       operationId: Update Menu Item
-      security:
-        - Bearer: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -63,27 +62,28 @@ paths:
     delete:
       description: Delete a menu item.
       operationId: Delete Menu Item
-      security:
-        - Bearer: []
+      produces:
+        - application/json
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
           required: true
           type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/item'
+            $ref: '#/definitions/delete-item'
 definitions:
   item:
-    type: object
     description: Menu item details.
     properties:
-      uuid:
-        type: string
-        description: ID of the menu item.
       cartID:
         type: string
         description: ID of the food cart.
@@ -96,8 +96,10 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
+      uuid:
+        type: string
+        description: ID of the menu item.
   itemDetails:
-    type: object
     properties:
       description:
         type: string
@@ -108,3 +110,63 @@ definitions:
       price:
         type: string
         description: Price of the menu item.
+  delete-item:
+    description: Deleted menu item.
+    properties:
+      action:
+        type: string
+        description: Action (delete).
+      application:
+        type: string
+        description: Application ID.
+      applicationName:
+        type: string
+        description: Application name.
+      duration:
+        type: integer
+        description: Duration of the operation.
+      entities:
+        description: Entity that was deleted.
+        properties:
+          cartID:
+            type: string
+            description: ID of the food cart.
+          created:
+            type: integer
+            description: Time the entity was created in epoch format.
+          description:
+            type: string
+            description: Description of the menu item.
+          itemName:
+            type: string
+            description: Name of the menu item.
+          metadata: 
+            type: object
+            description: Metadata.
+          modified:
+            type: integer
+            description: Time the entity was deleted in epoch format.
+          price:
+            type: number
+            description: Price of the menu item.
+          type:
+            type: string
+            description: Type of entity.
+          uuid:
+            type: string
+            description: ID of the menu item.
+      organization:
+        type: string
+        description: Organization name.
+      params:
+        type: object
+        description: List of parameters.
+      path:
+        type: string
+        description: Resource path.
+      timestamp:
+        type: integer
+        descrpition: Timestamp in epoch format.
+      uri:
+        type: string
+        description: Resource URI.

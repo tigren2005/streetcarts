@@ -1,24 +1,21 @@
 swagger: '2.0'
 info:
   version: '1.0'
+  description: Authenticate a user and get an access token.
   title: Authenticate user API
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
   - https
-consumes:
-  - application/x-www-form-urlencoded
-produces:
-  - application/json
 paths:
   '/accesstoken':
     post:
-      description: 'Authenticate user.'
+      description: 'Authenticate user and get an access token.'
       operationId: authenticateUser
       consumes:
-      - application/x-www-form-urlencoded
+        - application/x-www-form-urlencoded
       produces:
-      - application/json
+        - application/json
       parameters:
         - name: username
           in: formData
@@ -38,7 +35,7 @@ paths:
           default: password
         - name: Authorization
           in: header
-          description: 'Encode the consumer key and consumer secret for the registered developer application and pass as <code>Basic <i>encoded-value</i></code>.'
+          description: 'Base64 encode the consumer key and consumer secret (separated by a colon) for the registered developer application and pass as <code>Basic <i>encoded-value</i></code>.'
           required: true
           type: string
         - name: x-api-key

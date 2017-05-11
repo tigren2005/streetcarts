@@ -2,35 +2,27 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: Menus API
-  description: Manage menus in your food cart.
+  description: Manage menus for a food cart.
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
   - https
-securityDefinitions:
-   APIKeyHeader:
-     type: apiKey
-     in: header
-     name: x-api-key
-   Bearer:
-     type: apiKey
-     in: header
-     name: Authorization
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   '/menus/{menu_id}':
     get:
       description: View details for a menu.
       operationId: Get Menu by ID
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -41,12 +33,17 @@ paths:
     delete:
       description: Delete a menu.
       operationId: Delete Menu
-      security:
-        - Bearer: []
+      produces:
+        - application/json
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
       responses:
@@ -58,12 +55,17 @@ paths:
     get:
       description: View all items on a menu.
       operationId: Get Items on Menu
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -75,8 +77,8 @@ paths:
     put:
       description: Add an item to a menu.
       operationId: Add Item to Menu
-      security:
-        - Bearer: []
+      produces:
+        - application/json
       parameters:
         - name: menu_id
           in: path
@@ -85,6 +87,11 @@ paths:
           type: string
         - name: item_id
           in: path
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
       responses:
@@ -95,8 +102,8 @@ paths:
     delete:
       description: Remove an item from a menu.
       operationId: Remove Item from Menu
-      security:
-        - Bearer: []
+      produces:
+        - application/json
       parameters:
         - name: menu_id
           in: path
@@ -108,19 +115,20 @@ paths:
           description: ID of the menu item.
           required: true
           type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/item'
+            $ref: '#/definitions/delete-menu'
 definitions:
   menuDetails:
-    type: object
     description: Menu details.
     properties:
-      uuid:
-        description: ID of the menu.
-        type: string
       cartID:
         description: ID of the food cart.
         type: string
@@ -131,61 +139,29 @@ definitions:
         type: array
         description: List of menu items.
         items:
-          properties:
-            uuid:
-              type: string
-              description: ID of the menu item.
-            cartID:
-              type: string
-              description: ID of the food cart.
-            description:
-              type: string
-              description: Description of the menu item.
-            itemName:
-              type: string
-              description: Name of the menu item.
-            price:
-              type: number
-              description: Price of the menu item.
-  menu:
-    type: object
-    properties:
+          $ref: '#/definitions/item'
       uuid:
         description: ID of the menu.
         type: string
+  menu:
+    properties:
       cartID:
         description: ID of the food cart.
         type: string
       menuName:
         type: string
         description: Name of the menu.
+      uuid:
+        description: ID of the menu.
+        type: string
   items:
     type: array
     description: List of menu items.
     items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu item.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        description:
-          type: string
-          description: Description of the menu item.
-        itemName:
-          type: string
-          description: Name of the menu item.
-        price:
-          type: number
-          description: Price of the menu item.
+      $ref: '#/definitions/item'
   item:
-    type: object
     description: Menu item details.
     properties:
-      uuid:
-        type: string
-        description: ID of the menu item.
       cartID:
         type: string
         description: ID of the food cart.
@@ -198,3 +174,66 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
+      uuid:
+        type: string
+        description: ID of the menu item.
+  delete-menu:
+    description: Deleted menu item.
+    properties:
+      action:
+        type: string
+        description: Action (delete).
+      application:
+        type: string
+        description: Application ID.
+      applicationName:
+        type: string
+        description: Application name.
+      duration:
+        type: integer
+        description: Duration of the operation.
+      entities:
+        description: Entity that was deleted.
+        properties:
+          cartID:
+            type: string
+            description: ID of the food cart.
+          created:
+            type: integer
+            description: Time the entity was created in epoch format.
+          description:
+            type: string
+            description: Description of the menu item.
+          menuName:
+            type: string
+            description: Name of the menu.
+          metadata: 
+            type: object
+            description: Metadata.
+          modified:
+            type: integer
+            description: Time the entity was deleted in epoch format.
+          price:
+            type: number
+            description: Price of the menu item.
+          type:
+            type: string
+            description: Type of entity.
+          uuid:
+            type: string
+            description: ID of the menu item.
+      organization:
+        type: string
+        description: Organization name.
+      params:
+        type: object
+        description: List of parameters.
+      path:
+        type: string
+        description: Resource path.
+      timestamp:
+        type: integer
+        descrpition: Timestamp in epoch format.
+      uri:
+        type: string
+        description: Resource URI.

@@ -6,22 +6,13 @@ basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
   - https
-securityDefinitions:
-   APIKeyHeader:
-     type: apiKey
-     in: header
-     name: x-api-key
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   '/users':
     get:
       description: View all users.
       operationId: Get Users
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       responses:
         '200':
           description: Success
@@ -30,8 +21,10 @@ paths:
     post:
       description: Create a user.
       operationId: Create User
-      security:
-        - APIKeyHeader: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: body
           in: body
@@ -48,8 +41,8 @@ paths:
     get:
       description: View details for a user.
       operationId: Get User By ID
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: user_id
           in: path
@@ -63,77 +56,76 @@ paths:
             $ref: '#/definitions/user'
 definitions:
   userDetails:
-    type: object
     required:
       - username
       - password
     properties:
-      firstName:
-        type: string
-        description: First name of user.
-      lastName:
-        type: string
-        description: Last name of user.
       address:
         type: string
         description: Street address of user.
       city:
         type: string
         description: City where user resides.
-      region:
-        type: string
-        description: Region or state where user resides.
-      postalCode:
-        type: string
-        description: Postal code where user resides.
       email:
         type: string
-        description: Email for contacting user.
-      username:
+        description: User email.
+      firstName:
         type: string
-        description: User name.
+        description: First name of user.
+      lastName:
+        type: string
+        description: Last name of user.
       password:
         type: string
         description: Password.
+      postalCode:
+        type: string
+        description: Postal code where user resides.
+      region:
+        type: string
+        description: Region or state where user resides.
+      username:
+        type: string
+        description: User name.
   users:
     type: array
     description: List of users.
     items:
       $ref: '#/definitions/userDetails'
   user:
-    type: object
-    description: User details
+    description: User details.
     properties:
-      uuid:
-        type: string
-        description: ID of the user.
-      username:
-        type: string
-        description: Username.
-      email:
-        type: string
-        description: Email for contacting user.
       activated:
         type: boolean
         description: Flag that specifies whether the user is activated.
-      picture:
-        type: string
-        description: URL to user picture.
       address:
         type: string
         description: Street address of user.
       city:
         type: string
         description: City where user resides.
+      email:
+        type: string
+        description: User email.
       firstName:
         type: string
         description: First name of user.
       lastName:
         type: string
         description: Last name of user.
+      picture:
+        type: string
+        description: URL to user picture.
       postalCode:
         type: string
         description: Postal code where user resides.
       region:
         type: string
         description: Region or state where user resides.
+      uuid:
+        type: string
+        description: ID of the user.
+      username:
+        type: string
+        description: Username.
+

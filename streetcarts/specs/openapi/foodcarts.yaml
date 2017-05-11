@@ -7,26 +7,19 @@ basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
   - https
-securityDefinitions:
-   APIKeyHeader:
-     type: apiKey
-     in: header
-     name: x-api-key
-   Bearer:
-     type: apiKey
-     in: header
-     name: Authorization
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   '/foodcarts':
     get:
       description: View all food carts.
       operationId: GetFoodCarts
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
+      parameters: 
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -35,9 +28,16 @@ paths:
     post:
       description: Create a food cart.
       operationId: CreateFoodCart
-      security:
-        - Bearer: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
         - name: body
           in: body
           required: true
@@ -53,12 +53,17 @@ paths:
     get:
       description: View food cart details.
       operationId: GetFoodCartbyID
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -69,13 +74,20 @@ paths:
     put:
       description: Update food cart details.
       operationId: UpdateFoodCart
-      security:
-        - Bearer: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           required: true
           description: ID of the food cart.
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
           type: string
         - name: body
           in: body
@@ -91,9 +103,14 @@ paths:
     delete:
       description: Delete a food cart.
       operationId: DeleteFoodCart
-      security:
-        - Bearer: []
+      produces:
+        - application/json
       parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
         - name: cart_id
           in: path
           description: ID of the food cart.
@@ -108,12 +125,17 @@ paths:
     get:
       description: View the menus associated with a food cart.
       operationId: GetFoodCartMenus
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -124,12 +146,19 @@ paths:
     post:
       description: Add a menu to a food cart.
       operationId: CreateFoodCartMenu
-      security:
-        - Bearer: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -147,12 +176,17 @@ paths:
     get:
       description: View menu items associated with a food cart.
       operationId: GetFoodCartItems
-      security:
-        - APIKeyHeader: []
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -163,12 +197,19 @@ paths:
     post:
       description: Create a menu item to a food cart.
       operationId: CreateFoodCartItem
-      security:
-        - Bearer: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -188,22 +229,15 @@ definitions:
     description: List of food carts.
     items:
       properties:
+        cartname:
+          type: string
         uuid:
           type: string
           description: ID of the food cart.
-        cartname:
-          type: string
           description: Name of the food cart.
-        city:
-          type: string
-          description: City where the food cart is located.
   foodcart:
-    type: object
     description: Food cart details.
     properties:
-      uuid:
-        type: string
-        description: ID of the food cart.
       cartName:
         type: string
         description: Name of the food cart.
@@ -214,32 +248,13 @@ definitions:
         type: string
         description: Hours of operation.
       location:
-        type: object
         properties:
-          address:
-            type: string
-            description: Mailing address for the food cart.
-          city:
-            type: string
-            description: City where the food cart is located.
-          region:
-            type: string
-            description: State or region where the food cart is located.
-          country:
-            type: string
-            description: Country where the food cart is located.
-          postalCode:
-            type: string
-            description: Postal code for the food cart.
           latitude:
             type: string
             description: Latitude of the food cart. Required for locating the cart in mapping apps.
           longitude:
             type: string
             description: Longitude of the food cart. Required for locating the cart in mapping apps.
-          shortAddress:
-            type: string
-            description: 'Short description of the food cart location, including landmarks.'
       ownerID:
         type: string
         description: ID of the owner of the food cart.
@@ -249,6 +264,9 @@ definitions:
       url:
         type: string
         description: URL of the food cart.
+      uuid:
+        type: string
+        description: ID of the food cart.
   foodcartDetails:
     type: object
     properties:
@@ -262,7 +280,6 @@ definitions:
         type: string
         description: 'Hours of operation. For example: Monday through Saturday: 9-6, Closed Sunday.'
       location:
-        type: object
         properties:
           address:
             type: string
@@ -298,18 +315,8 @@ definitions:
     type: array
     description: List of menus.
     items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        menuName:
-          type: string
-          description: Name of the menu.
+      $ref: '#/definitions/menu'
   menuName:
-    type: object
     required:
       - menuName
     properties:
@@ -317,44 +324,24 @@ definitions:
         type: string
         description: Name of the menu.
   menu:
-    type: object
     properties:
-      uuid:
-        description: ID of the menu.
-        type: string
       cartID:
         description: ID of the food cart.
         type: string
       menuName:
         type: string
         description: Name of the menu.
+      uuid:
+        description: ID of the menu.
+        type: string
   items:
     type: array
     description: List of menu items.
     items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu item.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        description:
-          type: string
-          description: Description of the menu item.
-        itemName:
-          type: string
-          description: Name of the menu item.
-        price:
-          type: number
-          description: Price of the menu item.
+      $ref: '#/definitions/item'
   item:
-    type: object
     description: Menu item details.
     properties:
-      uuid:
-        type: string
-        description: ID of the menu item.
       cartID:
         type: string
         description: ID of the food cart.
@@ -367,8 +354,10 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
+      uuid:
+        type: string
+        description: ID of the menu item.
   itemDetails:
-    type: object
     properties:
       description:
         type: string
