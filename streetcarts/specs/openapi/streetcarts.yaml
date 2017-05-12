@@ -13,10 +13,20 @@ consumes:
 produces:
   - application/json
 paths:
-  /foodcarts:
+  '/foodcarts':
     get:
       description: View all food carts.
-      operationId: Get Food Carts
+      operationId: View food carts
+      produces:
+        - application/json
+      tags:
+        - Food Carts
+      parameters: 
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -24,8 +34,19 @@ paths:
             $ref: '#/definitions/foodcarts'
     post:
       description: Create a food cart.
-      operationId: Create Food Cart
+      operationId: Create food cart
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
         - name: body
           in: body
           required: true
@@ -40,11 +61,20 @@ paths:
   '/foodcarts/{cart_id}':
     get:
       description: View food cart details.
-      operationId: Get Food Cart by ID
+      operationId: View food cart details
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -54,12 +84,23 @@ paths:
             $ref: '#/definitions/foodcart'
     put:
       description: Update food cart details.
-      operationId: Update Food Cart
+      operationId: Update food cart
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
         - name: cart_id
           in: path
           required: true
           description: ID of the food cart.
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
           type: string
         - name: body
           in: body
@@ -74,8 +115,17 @@ paths:
             $ref: '#/definitions/foodcart'
     delete:
       description: Delete a food cart.
-      operationId: Delete Food Cart
+      operationId: Delete food cart
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
         - name: cart_id
           in: path
           description: ID of the food cart.
@@ -89,11 +139,20 @@ paths:
   '/foodcarts/{cart_id}/menus':
     get:
       description: View the menus associated with a food cart.
-      operationId: Get Food Cart Menus
+      operationId: View food cart menus
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -103,11 +162,22 @@ paths:
             $ref: '#/definitions/menus'
     post:
       description: Add a menu to a food cart.
-      operationId: Create Food Cart Menu
+      operationId: Create food cart menu
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -124,11 +194,20 @@ paths:
   '/foodcarts/{cart_id}/items':
     get:
       description: View menu items associated with a food cart.
-      operationId: Get Food Cart Itesm
+      operationId: View food cart items
+      produces:
+        - application/json
+      tags:
+        - Food Carts
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -138,11 +217,22 @@ paths:
             $ref: '#/definitions/items'
     post:
       description: Create a menu item to a food cart.
-      operationId: Create Food Cart Item
+      operationId: Create food cart menu item
+      tags:
+        - Food Carts
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: cart_id
           in: path
           description: ID of the food cart.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -159,7 +249,9 @@ paths:
   '/menus/{menu_id}':
     get:
       description: View details for a menu.
-      operationId: Get Menu by ID
+      operationId: View menu details
+      tags:
+        - Menus
       parameters:
         - name: menu_id
           in: path
@@ -173,7 +265,9 @@ paths:
             $ref: '#/definitions/menuDetails'
     delete:
       description: Delete a menu.
-      operationId: Delete Menu
+      operationId: Delete menu
+      tags:
+        - Menus
       parameters:
         - name: menu_id
           in: path
@@ -188,7 +282,9 @@ paths:
   '/menus/{menu_id}/items':
     get:
       description: View all items on a menu.
-      operationId: Get Items on Menu
+      operationId: View items on Menu
+      tags:
+        - Menus
       parameters:
         - name: menu_id
           in: path
@@ -203,7 +299,9 @@ paths:
   '/menus/{menu_id}/items/{item_id}':
     put:
       description: Add an item to a menu.
-      operationId: Add Item to Menu
+      operationId: Add item to menu
+      tags:
+        - Menus
       parameters:
         - name: menu_id
           in: path
@@ -221,7 +319,9 @@ paths:
             $ref: '#/definitions/item'
     delete:
       description: Remove an item from a menu.
-      operationId: Remove Item from Menu
+      operationId: Remove item from menu
+      tags:
+        - Menus
       parameters:
         - name: menu_id
           in: path
@@ -241,11 +341,20 @@ paths:
   '/items/{item_id}':
     get:
       description: View details for a menu item.
-      operationId: Get Menu Item By ID
+      operationId: View menu item details
+      produces:
+        - application/json
+      tags:
+        - Menu Items
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -255,11 +364,22 @@ paths:
             $ref: '#/definitions/item'
     put:
       description: Update a menu item.
-      operationId: Update Menu Item
+      operationId: Update menu item
+      tags:
+        - Menu Items
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
         - name: body
@@ -275,22 +395,41 @@ paths:
             $ref: '#/definitions/item'
     delete:
       description: Delete a menu item.
-      operationId: Delete Menu Item
+      operationId: Delete menu item
+      tags:
+        - Menu Items
+      produces:
+        - application/json
       parameters:
         - name: item_id
           in: path
           description: ID of the menu item.
           required: true
           type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/item'
-  /users:
+            $ref: '#/definitions/delete-item'
+  '/users':
     get:
-      description: View all users.
-      operationId: Get Users
+      description: 'View all users. <b>Note</b>: This method is not yet supported; the required permissions are not configured.'
+      operationId: View users
+      tags:
+        - Users
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -298,7 +437,13 @@ paths:
             $ref: '#/definitions/users'
     post:
       description: Create a user.
-      operationId: Create User
+      operationId: Create user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - Users
       parameters:
         - name: body
           in: body
@@ -306,19 +451,9 @@ paths:
           description: Updates for the menu item.
           schema:
             $ref: '#/definitions/userDetails'
-      responses:
-        '200':
-          description: Success
-          schema:
-            $ref: '#/definitions/user'
-  '/users/{user_id}':
-    get:
-      description: View details for a user.
-      operationId: Get User By ID
-      parameters:
-        - name: user_id
-          in: path
-          description: ID of the user.
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -326,62 +461,87 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/user'
+  '/users/{user_id}':
+    get:
+      description: 'View details for a user. <b>Note</b>: This method is not yet supported.'
+      operationId: View user details
+      produces:
+        - application/json
+      tags:
+        - Users
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/user'
+  '/accesstoken':
+    post:
+      description: 'Authenticate user and get an access token.'
+      operationId: Authenticate user
+      tags:
+        - Users
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: formData
+          description: 'Username.'
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 'Password.'
+          required: true
+          type: string
+        - name: grant_type
+          in: formData
+          description: 'Grant type. Must be set to <code>password</code>.'
+          required: true
+          type: string
+          default: password
+        - name: Authorization
+          in: header
+          description: 'Base64 encode the consumer key and consumer secret (separated by a colon) for the registered developer application and pass as <code>Basic <i>encoded-value</i></code>.'
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/access-token'
 definitions:
-  menus:
-    type: array
-    description: List of menus.
-    items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        menuName:
-          type: string
-          description: Name of the menu.
-  menuName:
-    type: object
-    required:
-      - menuName
-    properties:
-      menuName:
-        type: string
-        description: Name of the menu.
-  itemDetails:
-    type: object
-    properties:
-      description:
-        type: string
-        description: Description of the menu item.
-      itemName:
-        type: string
-        description: Name of the menu item.
-      price:
-        type: string
-        description: Price of the menu item.
   foodcarts:
     type: array
     description: List of food carts.
     items:
       properties:
+        cartname:
+          type: string
         uuid:
           type: string
           description: ID of the food cart.
-        cartname:
-          type: string
           description: Name of the food cart.
-        city:
-          type: string
-          description: City where the food cart is located.
   foodcart:
-    type: object
     description: Food cart details.
     properties:
-      uuid:
-        type: string
-        description: ID of the food cart.
       cartName:
         type: string
         description: Name of the food cart.
@@ -392,32 +552,13 @@ definitions:
         type: string
         description: Hours of operation.
       location:
-        type: object
         properties:
-          address:
-            type: string
-            description: Mailing address for the food cart.
-          city:
-            type: string
-            description: City where the food cart is located.
-          region:
-            type: string
-            description: State or region where the food cart is located.
-          country:
-            type: string
-            description: Country where the food cart is located.
-          postalCode:
-            type: string
-            description: Postal code for the food cart.
           latitude:
             type: string
             description: Latitude of the food cart. Required for locating the cart in mapping apps.
           longitude:
             type: string
             description: Longitude of the food cart. Required for locating the cart in mapping apps.
-          shortAddress:
-            type: string
-            description: 'Short description of the food cart location, including landmarks.'
       ownerID:
         type: string
         description: ID of the owner of the food cart.
@@ -427,6 +568,9 @@ definitions:
       url:
         type: string
         description: URL of the food cart.
+      uuid:
+        type: string
+        description: ID of the food cart.
   foodcartDetails:
     type: object
     properties:
@@ -440,7 +584,6 @@ definitions:
         type: string
         description: 'Hours of operation. For example: Monday through Saturday: 9-6, Closed Sunday.'
       location:
-        type: object
         properties:
           address:
             type: string
@@ -473,12 +616,8 @@ definitions:
         type: string
         description: URL of the food cart.
   menuDetails:
-    type: object
     description: Menu details.
     properties:
-      uuid:
-        description: ID of the menu.
-        type: string
       cartID:
         description: ID of the food cart.
         type: string
@@ -489,61 +628,29 @@ definitions:
         type: array
         description: List of menu items.
         items:
-          properties:
-            uuid:
-              type: string
-              description: ID of the menu item.
-            cartID:
-              type: string
-              description: ID of the food cart.
-            description:
-              type: string
-              description: Description of the menu item.
-            itemName:
-              type: string
-              description: Name of the menu item.
-            price:
-              type: number
-              description: Price of the menu item.
-  menu:
-    type: object
-    properties:
+          $ref: '#/definitions/item'
       uuid:
         description: ID of the menu.
         type: string
+  menu:
+    properties:
       cartID:
         description: ID of the food cart.
         type: string
       menuName:
         type: string
         description: Name of the menu.
+      uuid:
+        description: ID of the menu.
+        type: string
   items:
     type: array
     description: List of menu items.
     items:
-      properties:
-        uuid:
-          type: string
-          description: ID of the menu item.
-        cartID:
-          type: string
-          description: ID of the food cart.
-        description:
-          type: string
-          description: Description of the menu item.
-        itemName:
-          type: string
-          description: Name of the menu item.
-        price:
-          type: number
-          description: Price of the menu item.
+      $ref: '#/definitions/item'
   item:
-    type: object
     description: Menu item details.
     properties:
-      uuid:
-        type: string
-        description: ID of the menu item.
       cartID:
         type: string
         description: ID of the food cart.
@@ -556,78 +663,275 @@ definitions:
       price:
         type: number
         description: Price of the menu item.
+      uuid:
+        type: string
+        description: ID of the menu item.
+  itemDetails:
+    properties:
+      description:
+        type: string
+        description: Description of the menu item.
+      itemName:
+        type: string
+        description: Name of the menu item.
+      price:
+        type: string
+        description: Price of the menu item.
+  delete-item:
+    description: Deleted menu item.
+    properties:
+      action:
+        type: string
+        description: Action (delete).
+      application:
+        type: string
+        description: Application ID.
+      applicationName:
+        type: string
+        description: Application name.
+      duration:
+        type: integer
+        description: Duration of the operation.
+      entities:
+        description: Entity that was deleted.
+        properties:
+          cartID:
+            type: string
+            description: ID of the food cart.
+          created:
+            type: integer
+            description: Time the entity was created in epoch format.
+          description:
+            type: string
+            description: Description of the menu item.
+          itemName:
+            type: string
+            description: Name of the menu item.
+          metadata: 
+            type: object
+            description: Metadata.
+          modified:
+            type: integer
+            description: Time the entity was deleted in epoch format.
+          price:
+            type: number
+            description: Price of the menu item.
+          type:
+            type: string
+            description: Type of entity.
+          uuid:
+            type: string
+            description: ID of the menu item.
+      organization:
+        type: string
+        description: Organization name.
+      params:
+        type: object
+        description: List of parameters.
+      path:
+        type: string
+        description: Resource path.
+      timestamp:
+        type: integer
+        descrpition: Timestamp in epoch format.
+      uri:
+        type: string
+        description: Resource URI.
+  access-token:
+    properties:
+      access_token:
+        type: string
+        description: Access token that can be used to issue other API calls.
+      api_product_list: 
+        type: string
+        description: Aray of API product names for which this token is valid.
+      application_name:
+        type: string
+        description: Internal unique identifier for the developer application under which this token was generated.
+      client_id:
+        type: string
+        description: Consumer key for the registered developer application.
+      developer.email:
+        type: string
+        description: Email of the developer.
+      expires_in:
+        type: string
+        description: "Time that the access token expires. If set to 0, there is no expiration date."
+      issued-at:
+        type: string
+        description: Time the access token was issues in epoch format.
+      organization_name:
+        type: string
+        description: Organization name.
+      refresh_count:
+        type: string
+        description: Number of times the access token has been refreshed.
+      refresh_token:
+        type: string
+        description: Refresh token.
+      refresh_token_expires_in:
+        type: string
+        description: "Time that the access token expires. If set to 0, there is no expiration date."
+      refresh_token_issued_at:
+        type: string
+        description: Time the access token was issues in epoch format.
+      refresh_token_status: 
+        type: string
+        description: Status of the refresh token.
+      scope:
+        type: string
+        description: OAuth scopes granted for the user this token represents.
+      status: 
+        type: string
+        description: Status of the request.
+      token_type:
+        type: string
+        description: Token type (BearerToken).
+      USER_BAAS_TOKEN: 
+        type: string
+        description: Authorization token received from the backend data store. For internal use by StreetCarts.
+      USER_UUID: 
+        type: string
+        description: Unique ID in the data store for the user this token represents. For internal use by StreetCarts.
+  delete-menu:
+    description: Deleted menu item.
+    properties:
+      action:
+        type: string
+        description: Action (delete).
+      application:
+        type: string
+        description: Application ID.
+      applicationName:
+        type: string
+        description: Application name.
+      duration:
+        type: integer
+        description: Duration of the operation.
+      entities:
+        description: Entity that was deleted.
+        properties:
+          cartID:
+            type: string
+            description: ID of the food cart.
+          created:
+            type: integer
+            description: Time the entity was created in epoch format.
+          description:
+            type: string
+            description: Description of the menu item.
+          menuName:
+            type: string
+            description: Name of the menu.
+          metadata: 
+            type: object
+            description: Metadata.
+          modified:
+            type: integer
+            description: Time the entity was deleted in epoch format.
+          price:
+            type: number
+            description: Price of the menu item.
+          type:
+            type: string
+            description: Type of entity.
+          uuid:
+            type: string
+            description: ID of the menu item.
+      organization:
+        type: string
+        description: Organization name.
+      params:
+        type: object
+        description: List of parameters.
+      path:
+        type: string
+        description: Resource path.
+      timestamp:
+        type: integer
+        descrpition: Timestamp in epoch format.
+      uri:
+        type: string
+        description: Resource URI.
   userDetails:
-    type: object
     required:
       - username
       - password
     properties:
-      firstName:
-        type: string
-        description: First name of user.
-      lastName:
-        type: string
-        description: Last name of user.
       address:
         type: string
         description: Street address of user.
       city:
         type: string
         description: City where user resides.
-      region:
-        type: string
-        description: Region or state where user resides.
-      postalCode:
-        type: string
-        description: Postal code where user resides.
       email:
         type: string
-        description: Email for contacting user.
-      username:
+        description: User email.
+      firstName:
         type: string
-        description: User name.
+        description: First name of user.
+      lastName:
+        type: string
+        description: Last name of user.
       password:
         type: string
         description: Password.
+      postalCode:
+        type: string
+        description: Postal code where user resides.
+      region:
+        type: string
+        description: Region or state where user resides.
+      username:
+        type: string
+        description: User name.
   users:
     type: array
     description: List of users.
     items:
-      $ref: '#/definitions/userDetails'
+      properties:
+        email:
+          type: string
+          description: User email.
+        username:
+          type: string
+          description: Username.
+        uuid:
+          type: string
+          description: ID of the user.
   user:
-    type: object
-    description: User details
+    description: User details.
     properties:
-      uuid:
-        type: string
-        description: ID of the user.
-      username:
-        type: string
-        description: Username.
-      email:
-        type: string
-        description: Email for contacting user.
       activated:
         type: boolean
         description: Flag that specifies whether the user is activated.
-      picture:
-        type: string
-        description: URL to user picture.
       address:
         type: string
         description: Street address of user.
       city:
         type: string
         description: City where user resides.
+      email:
+        type: string
+        description: User email.
       firstName:
         type: string
         description: First name of user.
       lastName:
         type: string
         description: Last name of user.
+      picture:
+        type: string
+        description: URL to user picture.
       postalCode:
         type: string
         description: Postal code where user resides.
       region:
         type: string
         description: Region or state where user resides.
+      username:
+        type: string
+        description: Username.
+      uuid:
+        type: string
+        description: ID of the user.
