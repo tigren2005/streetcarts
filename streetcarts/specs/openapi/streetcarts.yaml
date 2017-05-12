@@ -6,12 +6,7 @@ info:
 basePath: /v1/streetcarts
 host: org_name-env.apigee.net
 schemes:
-  - http
   - https
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   '/foodcarts':
     get:
@@ -249,13 +244,20 @@ paths:
   '/menus/{menu_id}':
     get:
       description: View details for a menu.
-      operationId: View menu details
+      operationId: GetMenuByID
+      produces:
+        - application/json
       tags:
         - Menus
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -265,13 +267,20 @@ paths:
             $ref: '#/definitions/menuDetails'
     delete:
       description: Delete a menu.
-      operationId: Delete menu
+      operationId: DeleteMenu
+      produces:
+        - application/json
       tags:
         - Menus
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
           required: true
           type: string
       responses:
@@ -282,13 +291,20 @@ paths:
   '/menus/{menu_id}/items':
     get:
       description: View all items on a menu.
-      operationId: View items on Menu
+      operationId: GetMenuItems
+      produces:
+        - application/json
       tags:
         - Menus
       parameters:
         - name: menu_id
           in: path
           description: ID of the menu.
+          required: true
+          type: string
+        - name: x-api-key
+          in: header
+          description: 'Consumer key for the registered developer application.'
           required: true
           type: string
       responses:
@@ -299,7 +315,9 @@ paths:
   '/menus/{menu_id}/items/{item_id}':
     put:
       description: Add an item to a menu.
-      operationId: Add item to menu
+      operationId: AddMenuItems
+      produces:
+        - application/json
       tags:
         - Menus
       parameters:
@@ -312,6 +330,11 @@ paths:
           in: path
           required: true
           type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
@@ -319,7 +342,9 @@ paths:
             $ref: '#/definitions/item'
     delete:
       description: Remove an item from a menu.
-      operationId: Remove item from menu
+      operationId: RemoveMenuItems
+      produces:
+        - application/json
       tags:
         - Menus
       parameters:
@@ -333,11 +358,16 @@ paths:
           description: ID of the menu item.
           required: true
           type: string
+        - name: Authorization
+          in: header
+          description: 'Pass the access token returned when the user was authenticated as <code>Bearer <i>access-token</i></code>.'
+          required: true
+          type: string
       responses:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/item'
+            $ref: '#/definitions/delete-menu'
   '/items/{item_id}':
     get:
       description: View details for a menu item.
