@@ -52,7 +52,7 @@ paths:
   '/foodcarts/{cart_id}':
     get:
       description: View food cart details.
-      operationId: GetFoodCartbyID
+      operationId: GetFoodCartByID
       produces:
         - application/json
       parameters:
@@ -175,7 +175,7 @@ paths:
   '/foodcarts/{cart_id}/items':
     get:
       description: View menu items associated with a food cart.
-      operationId: GetFoodCartItems
+      operationId: GetFoodCartMenuItems
       produces:
         - application/json
       parameters:
@@ -196,7 +196,7 @@ paths:
             $ref: '#/definitions/items'
     post:
       description: Create a menu item to a food cart.
-      operationId: CreateFoodCartItem
+      operationId: CreateFoodCartMenuItem
       consumes:
         - application/json
       produces:

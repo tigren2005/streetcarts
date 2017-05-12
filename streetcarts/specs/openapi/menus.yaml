@@ -11,7 +11,7 @@ paths:
   '/menus/{menu_id}':
     get:
       description: View details for a menu.
-      operationId: Get Menu by ID
+      operationId: GetMenuByID
       produces:
         - application/json
       parameters:
@@ -32,7 +32,7 @@ paths:
             $ref: '#/definitions/menuDetails'
     delete:
       description: Delete a menu.
-      operationId: Delete Menu
+      operationId: DeleteMenu
       produces:
         - application/json
       parameters:
@@ -54,7 +54,7 @@ paths:
   '/menus/{menu_id}/items':
     get:
       description: View all items on a menu.
-      operationId: Get Items on Menu
+      operationId: GetMenuItems
       produces:
         - application/json
       parameters:
@@ -76,7 +76,7 @@ paths:
   '/menus/{menu_id}/items/{item_id}':
     put:
       description: Add an item to a menu.
-      operationId: Add Item to Menu
+      operationId: AddMenuItems
       produces:
         - application/json
       parameters:
@@ -101,7 +101,7 @@ paths:
             $ref: '#/definitions/item'
     delete:
       description: Remove an item from a menu.
-      operationId: Remove Item from Menu
+      operationId: RemoveMenuItems
       produces:
         - application/json
       parameters:

@@ -11,7 +11,7 @@ paths:
   '/items/{item_id}':
     get:
       description: View details for a menu item.
-      operationId: Get Menu Item By ID
+      operationId: GetMenuItemByID
       produces:
         - application/json
       parameters:
@@ -32,7 +32,7 @@ paths:
             $ref: '#/definitions/item'
     put:
       description: Update a menu item.
-      operationId: Update Menu Item
+      operationId: UpdateMenuItem
       consumes:
         - application/json
       produces:
@@ -61,7 +61,7 @@ paths:
             $ref: '#/definitions/item'
     delete:
       description: Delete a menu item.
-      operationId: Delete Menu Item
+      operationId: DeleteMenuItem
       produces:
         - application/json
       parameters:

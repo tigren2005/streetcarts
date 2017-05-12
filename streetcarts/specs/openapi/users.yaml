@@ -11,7 +11,7 @@ paths:
   '/users':
     get:
       description: 'View all users. <b>Note</b>: This method is not yet supported; the required permissions are not configured.'
-      operationId: Get Users
+      operationId: GetUsers
       produces:
         - application/json
       parameters:
@@ -27,7 +27,7 @@ paths:
             $ref: '#/definitions/users'
     post:
       description: Create a user.
-      operationId: Create User
+      operationId: CreateUser
       consumes:
         - application/json
       produces:
@@ -52,7 +52,7 @@ paths:
   '/users/{user_id}':
     get:
       description: 'View details for a user. <b>Note</b>: This method is not yet supported.'
-      operationId: Get User By ID
+      operationId: GetUserByID
       produces:
         - application/json
       parameters:
