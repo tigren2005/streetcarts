@@ -231,10 +231,10 @@ definitions:
       properties:
         cartname:
           type: string
+          description: Name of the food cart.
         uuid:
           type: string
           description: ID of the food cart.
-          description: Name of the food cart.
   foodcart:
     description: Food cart details.
     properties:
